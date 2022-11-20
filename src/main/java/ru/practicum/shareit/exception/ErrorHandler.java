@@ -1,0 +1,68 @@
+package ru.practicum.shareit.exception;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import javax.validation.ConstraintViolationException;
+import javax.validation.ValidationException;
+import java.util.Map;
+import java.util.Objects;
+
+
+@Slf4j
+@RestControllerAdvice
+public class ErrorHandler {
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleValidation(final ValidationException e) {
+        log.warn("Ошибка валидации 400 {}", e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleThrowable(final Throwable e) {
+        log.warn("Ошибка сервера 500 {}", e.getMessage());
+        return new ResponseEntity<>("Произошла непредвиденная ошибка сервера", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleExistingEmailException(final ExistingEmailException e) {
+        log.warn("Ошибка 500 {}", e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
+        log.warn("Ошибка валидации 400 {}", e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> exc(ConstraintViolationException e){
+        log.warn("Ошибка валидации 400 {}", e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleNotFoundException(NotFoundException exception) {
+        Map<String, String> result = Map.of("Ошибка не найденно", exception.getMessage());
+        log.warn(String.valueOf(result), exception);
+        return result;
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception) {
+        String message = exception.getMessage();
+        Map<String, String> result = Map.of("Ошибка Request", Objects.isNull(message) ? "Неизвестно" : message);
+        log.warn(String.valueOf(result), exception);
+        return result;
+    }
+}
