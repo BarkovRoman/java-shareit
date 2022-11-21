@@ -1,9 +1,10 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -32,7 +33,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto add(UserDto userDto) {
-        User user = UserMapper.toUser(userDto);
+        User user = UserMapper.toUser(userDto, 0);
         userRepository.add(user);
         long id = user.getId();
         user = userRepository.getBuId(user.getId())
@@ -42,13 +43,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto update(UserDto userDto) {
-        User user = UserMapper.toUser(userDto);
-        if (!userRepository.update(user)) {
-            throw new NotFoundException(String.format("User id = %s не найден", user.getId()));
+    public UserDto update(UserDto userDto, long id) {
+        User user = UserMapper.toUser(userDto, id);
+        if (!userRepository.update(user, id)) {
+            throw new NotFoundException(String.format("User id = %s не найден", id));
         }
-        long id = user.getId();
-        user = userRepository.getBuId(user.getId())
+        user = userRepository.getBuId(id)
                 .orElseThrow(() -> new NotFoundException(String.format("User id=%s не обновлен", id)));
         log.debug("Обновлен user {}", user);
         return UserMapper.toUserDto(user);

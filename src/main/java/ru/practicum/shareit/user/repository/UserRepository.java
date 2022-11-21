@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.repository;
 
 import ru.practicum.shareit.user.model.User;
 
@@ -12,7 +12,7 @@ public interface UserRepository {
 
     User add(User user);
 
-    boolean update(User user);
+    boolean update(User user, long id);
 
     boolean delete(long id);
 }
