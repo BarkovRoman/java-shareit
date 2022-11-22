@@ -9,20 +9,20 @@ import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryItemRepositoryImpl implements ItemRepository {
-    private final Map<Long, List<Item>> items = new HashMap<>();
+    private final Map<Long, List<Item>> itemsByUserId = new HashMap<>();
+    private final Map<Long, Item> items = new HashMap<>();
+    private long id;
 
     @Override
-    public Optional<Item> getBuId(long itemId) {
-        return items.values().stream()
-                .flatMap(Collection::stream)
-                .filter(item -> item.getId() == itemId)
-                .findFirst();
+    public Optional<Item> getById(long itemId) {          // Можно было бы использовать return Optional.ofNullable(users.get(id));
+        return Optional.ofNullable(items.get(itemId));
     }
 
     @Override
     public Item add(Item item, long userId) {
         item.setId(getId());
-        items.compute(userId, (id, userItems) -> {
+        items.put(item.getId(), item);
+        itemsByUserId.compute(userId, (id, userItems) -> {
             if (userItems == null) {
                 userItems = new ArrayList<>();
             }
@@ -36,49 +36,42 @@ public class InMemoryItemRepositoryImpl implements ItemRepository {
     public Item update(long userId, long itemId, Item item) {
         Item itemUpdate;
         try {
-            itemUpdate = items.get(userId).stream()
+            itemUpdate = itemsByUserId.get(userId).stream()
                     .filter(f -> f.getId() == itemId)
                     .findFirst()
                     .orElseThrow();
         } catch (Throwable e) {
             throw new NotFoundException(String.format("Item id=%s не пренадлежит User id=%s", itemId, userId));
         }
-        items.get(userId).remove(itemUpdate);
-        if (item.getName() != null) {
+        if (item.getName() != null && !item.getName().isBlank()) {
             itemUpdate.setName(item.getName());
         }
-        if (item.getDescription() != null) {
+        if (item.getDescription() != null && !item.getDescription().isBlank()) {
             itemUpdate.setDescription(item.getDescription());
         }
         if (item.getAvailable() != null) {
             itemUpdate.setAvailable(item.getAvailable());
         }
-        items.get(userId).add(itemUpdate);
         return itemUpdate;
     }
 
     @Override
-    public List<Item> getItemsBuUser(long userId) {
-        return items.getOrDefault(userId, Collections.emptyList());
+    public List<Item> getByUser(long userId) {
+        return itemsByUserId.getOrDefault(userId, Collections.emptyList());
     }
 
     @Override
-    public List<Item> searchItem(String text) {
-        return items.values().stream()
+    public List<Item> search(String text) {
+        return itemsByUserId.values().stream()
                 .flatMap(Collection::stream)
                 .filter(item ->
-                        item.getName().toLowerCase().trim().contains(text.toLowerCase()) ||
-                                item.getDescription().toLowerCase().trim().contains(text.toLowerCase()))
-                .filter(Item::getAvailable)
+                        (item.getName().toLowerCase().trim().contains(text.toLowerCase()) ||
+                                item.getDescription().toLowerCase().trim().contains(text.toLowerCase())) &&
+                                item.getAvailable())
                 .collect(Collectors.toList());
     }
 
     private long getId() {
-        return items.values()
-                .stream()
-                .flatMap(Collection::stream)
-                .mapToLong(Item::getId)
-                .max()
-                .orElse(0) + 1;
+        return ++id;
     }
 }

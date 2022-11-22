@@ -26,8 +26,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getBuId(long id) {
-        return UserMapper.toUserDto(userRepository.getBuId(id)
+    public UserDto getById(long id) {
+        return UserMapper.toUserDto(userRepository.getById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("User id=%s не найден", id)))
         );
     }
@@ -35,32 +35,29 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto add(UserDto userDto) {
         User user = UserMapper.toUser(userDto, 0);
-        userRepository.add(user);
-        long id = user.getId();
-        user = userRepository.getBuId(user.getId())
-                .orElseThrow(() -> new NotFoundException(String.format("User id=%s не coздан", id)));
-        log.debug("Добавлен user {}", user);
-        return UserMapper.toUserDto(user);
+        User userNew = userRepository.add(user);
+        log.debug("Добавлен user {}", userNew);
+        return UserMapper.toUserDto(userNew);
     }
 
     @Override
     public UserDto update(UserDto userDto, long id) {
+        isExistsUserById(id);
         User user = UserMapper.toUser(userDto, id);
-        if (!userRepository.update(user, id)) {
-            throw new NotFoundException(String.format("User id = %s не найден", id));
-        }
-        user = userRepository.getBuId(id)
-                .orElseThrow(() -> new NotFoundException(String.format("User id=%s не обновлен", id)));
+        userDto = UserMapper.toUserDto(userRepository.update(user, id));
         log.debug("Обновлен user {}", user);
-        return UserMapper.toUserDto(user);
+        return userDto;
     }
 
     @Override
     public void delete(long id) {
-        if (userRepository.delete(id)) {
-            log.debug("User id = {} удален", id);
-        } else {
-            throw new NotFoundException((String.format("User id = %s не найден", id)));
-        }
+        isExistsUserById(id);
+        userRepository.delete(id);
+        log.debug("User id = {} удален", id);
+    }
+
+    private void isExistsUserById(long id) {
+        userRepository.getById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("User id=%s не найден", id)));
     }
 }

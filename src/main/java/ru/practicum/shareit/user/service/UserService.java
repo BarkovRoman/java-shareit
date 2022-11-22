@@ -6,7 +6,7 @@ import java.util.List;
 public interface UserService {
     List<UserDto> getAll();
 
-    UserDto getBuId(long id);
+    UserDto getById(long id);
 
     UserDto add(UserDto userDto);
 

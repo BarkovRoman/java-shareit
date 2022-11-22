@@ -17,10 +17,8 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Optional<User> getBuId(long id) {
-        return users.values().stream()
-                .filter(user -> user.getId() == id)
-                .findFirst();
+    public Optional<User> getById(long id) {
+        return Optional.ofNullable(users.get(id));
     }
 
     @Override
@@ -33,28 +31,21 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public boolean update(User user, long id) {
+    public User update(User user, long id) {
         duplicationEmail(user);
-        if (users.containsKey(id)) {
-            users.get(id).setId(id);
-            if (user.getEmail() != null) {
-                users.get(id).setEmail(user.getEmail());
-            }
-            if (user.getName() != null) {
-                users.get(id).setName(user.getName());
-            }
-            return true;
+        User userUpdate = users.get(id);
+        if (user.getEmail() != null) {
+            userUpdate.setEmail(user.getEmail());
         }
-        return false;
+        if (user.getName() != null && !user.getName().isBlank()) {
+            userUpdate.setName(user.getName());
+        }
+        return userUpdate;
     }
 
     @Override
-    public boolean delete(long id) {
-        if (users.containsKey(id)) {
-            users.remove(id);
-            return true;
-        }
-        return false;
+    public void delete(long id) {
+        users.remove(id);
     }
 
     private long getId() {

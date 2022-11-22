@@ -7,13 +7,13 @@ import java.util.Optional;
 
 public interface ItemRepository {
 
-    Optional<Item> getBuId(long itemId);
+    Optional<Item> getById(long itemId);
 
     Item add(Item item, long userId);
 
     Item update(long userId, long itemId, Item item);
 
-    List<Item> getItemsBuUser(long userId);
+    List<Item> getByUser(long userId);
 
-    List<Item> searchItem(String text);
+    List<Item> search(String text);
 }

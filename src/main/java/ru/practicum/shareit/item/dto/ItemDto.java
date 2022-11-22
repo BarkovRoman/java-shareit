@@ -10,7 +10,7 @@ public class ItemDto {
     long id;
     @NotBlank
     String name;
-    @NotNull
+    @NotBlank
     String description;
     @NotNull
     Boolean available; // статус доступности

@@ -21,61 +21,54 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
 
     @Override
-    public ItemDto addItem(ItemDto itemDto, long userId) {
-        checkingUserBuId(userId);
+    public ItemDto add(ItemDto itemDto, long userId) {
+        isExistsUserById(userId);
         Item item = ItemMapper.toItem(itemDto, 0);
-        itemRepository.add(item, userId);
-        itemDto = ItemMapper.toItemDto(itemRepository.getBuId(item.getId())
-                .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не coздан", item.getId())))
-        );
-        log.debug("Добавлен item {}", item);
+        Item itemNew = itemRepository.add(item, userId);
+        itemDto = ItemMapper.toItemDto(itemNew);
+        log.debug("Добавлен item {}", itemNew);
         return itemDto;
     }
 
     @Override
     public ItemDto update(long userId, long itemId, ItemDto itemDto) {
-        checkingUserBuId(userId);
-        checkingItemBuId(itemId);
-
-
+        isExistsUserById(userId);
+        isExistsItemById(itemId);
         Item item = ItemMapper.toItem(itemDto, itemId);
-        itemRepository.update(userId, itemId, item);
-        itemDto = ItemMapper.toItemDto(
-                itemRepository.getBuId(item.getId())
-                        .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не обновлен", item.getId()))));
+        itemDto = ItemMapper.toItemDto(itemRepository.update(userId, itemId, item));
         log.debug("Обновление item {}", item);
         return itemDto;
     }
 
     @Override
-    public List<ItemDto> getItems(long userId) {
-        checkingUserBuId(userId);
-        return itemRepository.getItemsBuUser(userId).stream()
+    public List<ItemDto> getByUser(long userId) {
+        isExistsUserById(userId);
+        return itemRepository.getByUser(userId).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public ItemDto getBuId(long itemId) {
-        checkingItemBuId(itemId);
-        return ItemMapper.toItemDto(itemRepository.getBuId(itemId)
+    public ItemDto getById(long itemId) {
+        isExistsItemById(itemId);
+        return ItemMapper.toItemDto(itemRepository.getById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не найден", itemId))));
     }
 
     @Override
-    public List<ItemDto> searchItem(String text) {
-        return itemRepository.searchItem(text).stream()
+    public List<ItemDto> search(String text) {
+        return itemRepository.search(text).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
 
-    private void checkingUserBuId(long id) {
-        userRepository.getBuId(id)
+    private void isExistsUserById(long id) {
+        userRepository.getById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("User id=%s не найден", id)));
     }
 
-    private void checkingItemBuId(long id) {
-        itemRepository.getBuId(id)
+    private void isExistsItemById(long id) {
+        itemRepository.getById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("User id=%s не найден", id)));
     }
 }
