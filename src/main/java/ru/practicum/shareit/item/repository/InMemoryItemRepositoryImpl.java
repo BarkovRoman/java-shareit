@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.repository;
 
 import org.springframework.stereotype.Repository;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.*;
@@ -22,7 +23,7 @@ public class InMemoryItemRepositoryImpl implements ItemRepository {
     public Item add(Item item, long userId) {
         item.setId(getId());
         items.compute(userId, (id, userItems) -> {
-            if(userItems == null) {
+            if (userItems == null) {
                 userItems = new ArrayList<>();
             }
             userItems.add(item);
@@ -33,11 +34,15 @@ public class InMemoryItemRepositoryImpl implements ItemRepository {
 
     @Override
     public Item update(long userId, long itemId, Item item) {
-        Item itemUpdate = items.get(userId).stream()
-                .filter(f -> f.getId() == itemId)
-                .findFirst()
-                .orElseThrow();
-
+        Item itemUpdate;
+        try {
+            itemUpdate = items.get(userId).stream()
+                    .filter(f -> f.getId() == itemId)
+                    .findFirst()
+                    .orElseThrow();
+        } catch (Throwable e) {
+            throw new NotFoundException(String.format("Item id=%s не пренадлежит User id=%s", itemId, userId));
+        }
         items.get(userId).remove(itemUpdate);
         if (item.getName() != null) {
             itemUpdate.setName(item.getName());
@@ -45,7 +50,9 @@ public class InMemoryItemRepositoryImpl implements ItemRepository {
         if (item.getDescription() != null) {
             itemUpdate.setDescription(item.getDescription());
         }
-        itemUpdate.setAvailable(item.isAvailable());
+        if (item.getAvailable() != null) {
+            itemUpdate.setAvailable(item.getAvailable());
+        }
         items.get(userId).add(itemUpdate);
         return itemUpdate;
     }
@@ -59,9 +66,11 @@ public class InMemoryItemRepositoryImpl implements ItemRepository {
     public List<Item> searchItem(String text) {
         return items.values().stream()
                 .flatMap(Collection::stream)
-                .filter(item -> item.getName().contains(text) || item.getDescription().contains(text))
+                .filter(item ->
+                        item.getName().toLowerCase().trim().contains(text.toLowerCase()) ||
+                                item.getDescription().toLowerCase().trim().contains(text.toLowerCase()))
+                .filter(Item::getAvailable)
                 .collect(Collectors.toList());
-
     }
 
     private long getId() {

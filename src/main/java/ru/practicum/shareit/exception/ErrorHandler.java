@@ -13,6 +13,7 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -38,9 +39,16 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
-        log.warn("Ошибка валидации 400 {}", e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
+        Map<String, String> result = exception.getFieldErrors().stream()
+                .collect(Collectors.toMap(
+                        fieldError ->
+                                String.format("Ошибка Валидации '%s' значение = '%s'",
+                                        fieldError.getField(), fieldError.getRejectedValue()),
+                        fieldError -> Objects.requireNonNullElse(fieldError.getDefaultMessage(), "")));
+        log.warn(String.valueOf(result), exception);
+        return result;
     }
 
     @ExceptionHandler

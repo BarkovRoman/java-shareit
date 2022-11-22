@@ -23,7 +23,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto addItem(ItemDto itemDto, long userId) {
         checkingUserBuId(userId);
-        Item item = ItemMapper.toItem(itemDto);
+        Item item = ItemMapper.toItem(itemDto, 0);
         itemRepository.add(item, userId);
         itemDto = ItemMapper.toItemDto(itemRepository.getBuId(item.getId())
                 .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не coздан", item.getId())))
@@ -37,11 +37,12 @@ public class ItemServiceImpl implements ItemService {
         checkingUserBuId(userId);
         checkingItemBuId(itemId);
 
-        Item item = ItemMapper.toItem(itemDto);
+
+        Item item = ItemMapper.toItem(itemDto, itemId);
         itemRepository.update(userId, itemId, item);
         itemDto = ItemMapper.toItemDto(
                 itemRepository.getBuId(item.getId())
-                        .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не coздан", item.getId()))));
+                        .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не обновлен", item.getId()))));
         log.debug("Обновление item {}", item);
         return itemDto;
     }

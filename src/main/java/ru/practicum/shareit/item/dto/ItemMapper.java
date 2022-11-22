@@ -11,14 +11,14 @@ public class ItemMapper {
                 item.getId(),
                 item.getName(),
                 item.getDescription(),
-                item.isAvailable(),
+                item.getAvailable(),
                 item.getRequest() != null ? item.getRequest().getId() : 0
         );
     }
 
-    public static Item toItem(ItemDto itemDto) {
+    public static Item toItem(ItemDto itemDto, long id) {
         return new Item(
-                itemDto.getId(),
+                id,
                 itemDto.getName(),
                 itemDto.getDescription(),
                 itemDto.getAvailable(),

@@ -11,7 +11,6 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
     private final Map<Long, User> users = new HashMap<>();
     private long id = 0;
 
-    //private final List<User> users = new ArrayList<>();
     @Override
     public List<User> getAll() {
         return new ArrayList<>(users.values());
@@ -44,7 +43,6 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
             if (user.getName() != null) {
                 users.get(id).setName(user.getName());
             }
-            //users.put(id, user);
             return true;
         }
         return false;
