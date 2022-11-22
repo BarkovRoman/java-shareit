@@ -17,17 +17,17 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
-    UserRepository userRepository;
-    ItemRepository itemRepository;
+    private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
 
     @Override
     public ItemDto addItem(ItemDto itemDto, long userId) {
         checkingUserBuId(userId);
         Item item = ItemMapper.toItem(itemDto);
         itemRepository.add(item, userId);
-        itemDto = ItemMapper.toItemDto(
-                itemRepository.getBuId(item.getId())
-                        .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не coздан", item.getId()))));
+        itemDto = ItemMapper.toItemDto(itemRepository.getBuId(item.getId())
+                .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не coздан", item.getId())))
+        );
         log.debug("Добавлен item {}", item);
         return itemDto;
     }

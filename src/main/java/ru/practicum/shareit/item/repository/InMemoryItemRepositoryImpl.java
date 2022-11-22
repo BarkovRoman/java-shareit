@@ -33,13 +33,21 @@ public class InMemoryItemRepositoryImpl implements ItemRepository {
 
     @Override
     public Item update(long userId, long itemId, Item item) {
-        Item itemRemove = items.get(userId).stream()
+        Item itemUpdate = items.get(userId).stream()
                 .filter(f -> f.getId() == itemId)
                 .findFirst()
                 .orElseThrow();
-        items.get(userId).remove(itemRemove);
-        items.get(userId).add(item);
-        return item;
+
+        items.get(userId).remove(itemUpdate);
+        if (item.getName() != null) {
+            itemUpdate.setName(item.getName());
+        }
+        if (item.getDescription() != null) {
+            itemUpdate.setDescription(item.getDescription());
+        }
+        itemUpdate.setAvailable(item.isAvailable());
+        items.get(userId).add(itemUpdate);
+        return itemUpdate;
     }
 
     @Override
