@@ -52,7 +52,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> exc(ConstraintViolationException e){
+    public ResponseEntity<String> exc(ConstraintViolationException e) {
         log.warn("Ошибка валидации 400 {}", e.getMessage());
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
