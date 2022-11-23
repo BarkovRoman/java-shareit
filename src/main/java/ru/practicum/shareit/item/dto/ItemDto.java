@@ -15,4 +15,5 @@ public class ItemDto {
     @NotNull
     Boolean available; // статус доступности
     long request; // ссылка на запрос создания вещи другого пользователя
+    long userId;
 }

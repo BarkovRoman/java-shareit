@@ -1,7 +1,6 @@
 package ru.practicum.shareit.user.repository;
 
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.exception.ExistingEmailException;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
@@ -53,12 +52,12 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
     }
 
     private void duplicationEmail(User user) {
-        long count = users.values().stream()
+        users.values().stream()
                 .map(User::getEmail)
                 .filter(f -> f.equals(user.getEmail()))
-                .count();
-        if (count != 0) {
-            throw new ExistingEmailException(String.format("User с email = %s уже существует", user.getEmail()));
-        }
+                .findFirst()
+                .ifPresent((email) -> {
+                    throw new RuntimeException(String.format("User с email = %s уже существует", email));
+                });
     }
 }

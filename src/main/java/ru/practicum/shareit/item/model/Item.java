@@ -11,4 +11,5 @@ public class Item {
     private String description;
     private Boolean available; // статус доступности
     private ItemRequest request; // ссылка на запрос создания вещи другого пользователя
+    private long userId;
 }

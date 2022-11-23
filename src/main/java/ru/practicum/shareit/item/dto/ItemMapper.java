@@ -13,17 +13,19 @@ public class ItemMapper {
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
-                item.getRequest() != null ? item.getRequest().getId() : 0
+                item.getRequest() != null ? item.getRequest().getId() : 0,
+                item.getUserId()
         );
     }
 
-    public static Item toItem(ItemDto itemDto, long id) {
+    public static Item toItem(ItemDto itemDto, long userId, long itemId) {
         return new Item(
-                id,
+                itemId,
                 itemDto.getName(),
                 itemDto.getDescription(),
                 itemDto.getAvailable(),
-                itemDto.getRequest() != 0 ? new ItemRequest() : null
+                itemDto.getRequest() != 0 ? new ItemRequest() : null,
+                userId
         );
     }
 }

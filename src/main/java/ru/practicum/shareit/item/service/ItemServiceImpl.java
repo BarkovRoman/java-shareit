@@ -23,7 +23,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto add(ItemDto itemDto, long userId) {
         isExistsUserById(userId);
-        Item item = ItemMapper.toItem(itemDto, 0);
+        Item item = ItemMapper.toItem(itemDto, userId, 0);
         Item itemNew = itemRepository.add(item, userId);
         itemDto = ItemMapper.toItemDto(itemNew);
         log.debug("Добавлен item {}", itemNew);
@@ -34,7 +34,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto update(long userId, long itemId, ItemDto itemDto) {
         isExistsUserById(userId);
         isExistsItemById(itemId);
-        Item item = ItemMapper.toItem(itemDto, itemId);
+        Item item = ItemMapper.toItem(itemDto, userId, itemId);
         itemDto = ItemMapper.toItemDto(itemRepository.update(userId, itemId, item));
         log.debug("Обновление item {}", item);
         return itemDto;
