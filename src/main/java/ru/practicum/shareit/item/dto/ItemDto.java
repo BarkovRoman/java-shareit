@@ -1,7 +1,19 @@
 package ru.practicum.shareit.item.dto;
 
-/**
- * TODO Sprint add-controllers.
- */
+import lombok.Value;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+@Value
 public class ItemDto {
+    long id;
+    @NotBlank
+    String name;
+    @NotBlank
+    String description;
+    @NotNull
+    Boolean available; // статус доступности
+    long request; // ссылка на запрос создания вещи другого пользователя
+    long userId;
 }
