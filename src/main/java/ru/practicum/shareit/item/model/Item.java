@@ -1,8 +1,6 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
-import org.hibernate.annotations.Table;
-import ru.practicum.shareit.request.ItemRequest;
 
 import javax.persistence.*;
 
@@ -15,9 +13,10 @@ public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private String description;
-
     @Column(name = "is_available", nullable = false)
     private Boolean available; // статус доступности
 

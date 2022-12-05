@@ -1,3 +1,4 @@
+/*
 package ru.practicum.shareit.user.repository;
 
 import org.springframework.stereotype.Repository;
@@ -61,3 +62,4 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
                 });
     }
 }
+*/

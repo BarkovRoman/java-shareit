@@ -1,3 +1,4 @@
+/*
 package ru.practicum.shareit.item.repository;
 
 import org.springframework.stereotype.Repository;
@@ -70,3 +71,4 @@ public class InMemoryItemRepositoryImpl implements ItemRepository {
         return ++id;
     }
 }
+*/

@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAll() {
-        return userRepository.getAll().stream()
+        return userRepository.findAll().stream()
                 .map(mapper::toUserDto)
                 .collect(Collectors.toList());
     }
@@ -35,19 +35,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto add(UserDto userDto) {
-        User user = mapper.toUser(userDto, 0);
-        User userNew = userRepository.add(user);
-        log.debug("Добавлен user {}", userNew);
-        return mapper.toUserDto(userNew);
+        User user = userRepository.save(mapper.toUser(userDto, 0));
+        log.debug("Добавлен user {}", user);
+        return mapper.toUserDto(user);
     }
 
     @Override
     public UserDto update(UserDto userDto, long id) {
         isExistsUserById(id);
-        User user = mapper.toUser(userDto, id);
-        userDto = mapper.toUserDto(userRepository.update(user, id));
+        User user = userRepository.update(mapper.toUser(userDto, id));
         log.debug("Обновлен user {}", user);
-        return userDto;
+        return mapper.toUserDto(user);
     }
 
     @Override

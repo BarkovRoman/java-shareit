@@ -1,12 +1,8 @@
 package ru.practicum.shareit.user.model;
 
 import lombok.*;
-import org.hibernate.annotations.Table;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 //@Data
 @AllArgsConstructor
@@ -19,8 +15,11 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false)
     private long id;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private String email;
 
     public User() {
