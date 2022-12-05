@@ -35,7 +35,7 @@ public class InMemoryItemRepositoryImpl implements ItemRepository {
     @Override
     public Item update(long userId, long itemId, Item item) {
         Item itemUpdate = items.get(itemId);
-        if (itemUpdate.getUserId() != userId) {
+        if (itemUpdate.getOwner() != userId) {
             throw new NotFoundException(String.format("Item id=%s не пренадлежит User id=%s", itemId, userId));
         }
         if (item.getName() != null && !item.getName().isBlank()) {

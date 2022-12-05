@@ -10,6 +10,6 @@ public class Item {
     private String name;
     private String description;
     private Boolean available; // статус доступности
-    private ItemRequest request; // ссылка на запрос создания вещи другого пользователя
-    private long userId;
+    //private ItemRequest request; // ссылка на запрос создания вещи другого пользователя
+    private long owner;
 }

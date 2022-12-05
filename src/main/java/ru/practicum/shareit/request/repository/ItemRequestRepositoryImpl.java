@@ -1,7 +1,7 @@
-package ru.practicum.shareit.request;
+package ru.practicum.shareit.request.repository;
 
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ItemRequestResitoryImpl implements ItemRequestResitory {
+public class ItemRequestRepositoryImpl implements ItemRequestRepository {
 }

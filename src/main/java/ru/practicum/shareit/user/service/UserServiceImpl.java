@@ -17,34 +17,35 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final UserMapper mapper;
 
     @Override
     public List<UserDto> getAll() {
         return userRepository.getAll().stream()
-                .map(UserMapper::toUserDto)
+                .map(mapper::toUserDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public UserDto getById(long id) {
-        return UserMapper.toUserDto(userRepository.getById(id)
+        return mapper.toUserDto(userRepository.getById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("User id=%s не найден", id)))
         );
     }
 
     @Override
     public UserDto add(UserDto userDto) {
-        User user = UserMapper.toUser(userDto, 0);
+        User user = mapper.toUser(userDto, 0);
         User userNew = userRepository.add(user);
         log.debug("Добавлен user {}", userNew);
-        return UserMapper.toUserDto(userNew);
+        return mapper.toUserDto(userNew);
     }
 
     @Override
     public UserDto update(UserDto userDto, long id) {
         isExistsUserById(id);
-        User user = UserMapper.toUser(userDto, id);
-        userDto = UserMapper.toUserDto(userRepository.update(user, id));
+        User user = mapper.toUser(userDto, id);
+        userDto = mapper.toUserDto(userRepository.update(user, id));
         log.debug("Обновлен user {}", user);
         return userDto;
     }

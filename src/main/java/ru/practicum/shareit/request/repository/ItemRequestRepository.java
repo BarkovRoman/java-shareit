@@ -1,4 +1,4 @@
-package ru.practicum.shareit.request;
+package ru.practicum.shareit.request.repository;
 
-public interface ItemRequestResitory {
+public interface ItemRequestRepository {
 }
