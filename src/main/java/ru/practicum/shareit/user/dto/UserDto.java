@@ -15,6 +15,5 @@ public class UserDto {
 
     @Email(groups = {Create.class, Update.class}, message = "Не верный адрес Email")
     @NotNull(groups = {Create.class}, message = "Email = null")
-
     String email;
 }
