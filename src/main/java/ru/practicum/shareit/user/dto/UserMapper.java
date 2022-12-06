@@ -3,6 +3,7 @@ package ru.practicum.shareit.user.dto;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import ru.practicum.shareit.user.model.User;
 
 /*@NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -27,5 +28,6 @@ public class UserMapper {
 @Mapper(componentModel = "spring")
 public interface UserMapper {
     UserDto toUserDto(User user);
-    User toUser(UserDto userDto, long id);
+    @Mapping(target = "id", source = "id")
+    User toUser(UserDto userDto, Long id);
 }

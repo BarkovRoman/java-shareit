@@ -6,20 +6,18 @@ import javax.persistence.*;
 
 //@Data
 @AllArgsConstructor
-@Setter
-@Getter
-@ToString
+@Setter @Getter @ToString
 @Entity
 @Table(name = "users", schema = "public")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
-    private long id;
-    @Column(nullable = false)
+    @Column(name = "id", nullable = false)
+    private Long id;
+    @Column(name = "name", nullable = false)
     private String name;
-    @Column(nullable = false)
+    @Column(name = "email", nullable = false)
     private String email;
 
     public User() {

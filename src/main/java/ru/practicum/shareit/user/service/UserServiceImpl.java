@@ -4,17 +4,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
-import ru.practicum.shareit.user.model.User;
 
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper mapper;
@@ -27,36 +29,39 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getById(long id) {
-        return mapper.toUserDto(userRepository.getById(id)
+    public UserDto getById(Long id) {
+        return mapper.toUserDto(userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("User id=%s не найден", id)))
         );
     }
 
     @Override
+    @Transactional
     public UserDto add(UserDto userDto) {
-        User user = userRepository.save(mapper.toUser(userDto, 0));
+        User user = userRepository.save(mapper.toUser(userDto, 0L));
         log.debug("Добавлен user {}", user);
         return mapper.toUserDto(user);
     }
 
     @Override
-    public UserDto update(UserDto userDto, long id) {
+    @Transactional
+    public UserDto update(UserDto userDto, Long id) {
         isExistsUserById(id);
-        User user = userRepository.update(mapper.toUser(userDto, id));
+        User user = mapper.toUser(userDto, id);
+        userRepository.updateNameAndEmailById(user.getName(), user.getEmail(), user.getId());
         log.debug("Обновлен user {}", user);
         return mapper.toUserDto(user);
     }
 
     @Override
-    public void delete(long id) {
+    public void delete(Long id) {
         isExistsUserById(id);
-        userRepository.delete(id);
+        userRepository.deleteById(id);
         log.debug("User id = {} удален", id);
     }
 
     private void isExistsUserById(long id) {
-        userRepository.getById(id)
+        userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("User id=%s не найден", id)));
     }
 }

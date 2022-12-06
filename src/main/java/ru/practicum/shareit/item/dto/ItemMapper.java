@@ -33,10 +33,7 @@ public class ItemMapper {
 }*/
 @Mapper(componentModel = "spring")
 public interface ItemMapper {
-    //@Mapping(target = "request", source = "item.getRequest().getId()")
     ItemDto toItemDto(Item item);
     @Mapping(target = "id", source = "itemId")
-    @Mapping(target = "owner", source = "userId")
-    //@Mapping(target = "request", source = "null")
-    Item toItem(ItemDto itemDto, long userId, long itemId);
+    Item toItem(ItemDto itemDto, Long userId, Long itemId);
 }

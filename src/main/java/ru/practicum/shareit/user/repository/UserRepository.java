@@ -3,28 +3,22 @@ package ru.practicum.shareit.user.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.List;
-import java.util.Optional;
-
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long>, UserRepositoryCustom {
     @Modifying
-    @Query("update User u set u.name = :name1, u.email = :email2 where u.name = :name3 and u.email = :email4")
-    int updateNameAndEmailByNameAndEmail(@NonNull @Param("name") String name, @NonNull @Param("email") String email, @NonNull @Param("name") String name1, @NonNull @Param("email") String email1);
+    @Query("update User u set u.name = ?1, u.email = ?2 where u.name is not null AND u.email is not null AND u.id = ?3")
+    int updateNameAndEmailById(@Nullable String name, @Nullable String email, Long id);
+
     @Modifying
-    @Query("update User u set u.name = :name1 where upper(u.name) = upper(:name2)")
-    int updateNameByNameAllIgnoreCase(@Param("name") String name, @Param("name") String name1);
-    @Override
-    List<User> findAll();
+    @Query("update User u set u.name = ?1")
+    int updateNameBy(@Nullable String name);
 
-    Optional<User> getById(long id);
-
-    User update(User user);
-
-    void delete(long id);
+    @Modifying
+    @Query("update User u set u.name = ?1 where u.name is not null AND u.id = ?2")
+    int updateNameByNameNotNull(String name, Long id);
 
     /*List<User> getAll();
 

@@ -28,7 +28,7 @@ public class Item {
 
     }
 
-    /*@Override
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Item)) return false;
@@ -38,5 +38,5 @@ public class Item {
     @Override
     public int hashCode() {
         return getClass().hashCode();
-    }*/
+    }
 }

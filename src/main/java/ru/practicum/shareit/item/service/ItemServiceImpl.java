@@ -22,54 +22,55 @@ public class ItemServiceImpl implements ItemService {
     private final ItemMapper mapper;
 
     @Override
-    public ItemDto add(ItemDto itemDto, long userId) {
+    public ItemDto add(ItemDto itemDto, Long userId) {
         isExistsUserById(userId);
-        Item item = mapper.toItem(itemDto, userId, 0);
-        Item itemNew = itemRepository.add(item, userId);
+        Item item = mapper.toItem(itemDto, userId, null);
+        Item itemNew = itemRepository.save(item);
         itemDto = mapper.toItemDto(itemNew);
         log.debug("Добавлен item {}", itemNew);
         return itemDto;
     }
 
     @Override
-    public ItemDto update(long userId, long itemId, ItemDto itemDto) {
+    public ItemDto update(Long userId, Long itemId, ItemDto itemDto) {
         isExistsUserById(userId);
         isExistsItemById(itemId);
         Item item = mapper.toItem(itemDto, userId, itemId);
-        itemDto = mapper.toItemDto(itemRepository.update(userId, itemId, item));
+        itemDto = mapper.toItemDto(itemRepository.save(/*userId, itemId,*/ item));
         log.debug("Обновление item {}", item);
         return itemDto;
     }
 
     @Override
-    public List<ItemDto> getByUser(long userId) {
+    public List<ItemDto> getByUser(Long userId) {
         isExistsUserById(userId);
-        return itemRepository.getByUser(userId).stream()
+        return itemRepository.findById(userId).stream()
                 .map(mapper::toItemDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public ItemDto getById(long itemId) {
+    public ItemDto getById(Long itemId) {
         isExistsItemById(itemId);
-        return mapper.toItemDto(itemRepository.getById(itemId)
+        return mapper.toItemDto(itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не найден", itemId))));
     }
 
     @Override
     public List<ItemDto> search(String text) {
-        return itemRepository.search(text).stream()
+        return itemRepository.findAll().stream()
                 .map(mapper::toItemDto)
                 .collect(Collectors.toList());
     }
 
-    private void isExistsUserById(long id) {
-        userRepository.getById(id)
+    private void isExistsUserById(Long id) {
+        userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("User id=%s не найден", id)));
     }
 
-    private void isExistsItemById(long id) {
-        itemRepository.getById(id)
+    private void isExistsItemById(Long id) {
+        itemRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("User id=%s не найден", id)));
     }
 }
+

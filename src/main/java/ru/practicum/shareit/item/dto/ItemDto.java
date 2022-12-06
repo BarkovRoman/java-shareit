@@ -9,13 +9,11 @@ import javax.validation.constraints.NotNull;
 @Value
 @AllArgsConstructor
 public class ItemDto {
-    long id;
+    Long id;
     @NotBlank
     String name;
     @NotBlank
     String description;
     @NotNull
     Boolean available; // статус доступности
-    //long request; // ссылка на запрос создания вещи другого пользователя
-    long owner;
 }

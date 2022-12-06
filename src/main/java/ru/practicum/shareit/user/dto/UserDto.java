@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 @Value
 public class UserDto {
-    long id;
+    Long id;
 
     @NotBlank(groups = {Create.class})
     String name;

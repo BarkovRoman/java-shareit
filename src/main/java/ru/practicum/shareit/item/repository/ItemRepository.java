@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    Optional<Item> getById(long itemId);
+    /*Optional<Item> getById(long itemId);
 
     Item add(Item item, long userId);
 
@@ -16,5 +16,5 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 
     List<Item> getByUser(long userId);
 
-    List<Item> search(String text);
+    List<Item> search(String text);*/
 }
