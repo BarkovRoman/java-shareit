@@ -36,7 +36,7 @@ public class ItemServiceImpl implements ItemService {
         isExistsUserById(userId);
         isExistsItemById(itemId);
         Item item = mapper.toItem(itemDto, userId, itemId);
-        itemDto = mapper.toItemDto(itemRepository.save(/*userId, itemId,*/ item));
+        itemDto = mapper.toItemDto(itemRepository.update(userId, itemId, item));
         log.debug("Обновление item {}", item);
         return itemDto;
     }
@@ -44,21 +44,20 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> getByUser(Long userId) {
         isExistsUserById(userId);
-        return itemRepository.findById(userId).stream()
+        return itemRepository.findByOwner(userId).stream()
                 .map(mapper::toItemDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public ItemDto getById(Long itemId) {
-        isExistsItemById(itemId);
         return mapper.toItemDto(itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не найден", itemId))));
     }
 
     @Override
     public List<ItemDto> search(String text) {
-        return itemRepository.findAll().stream()
+        return itemRepository.search(text).stream()
                 .map(mapper::toItemDto)
                 .collect(Collectors.toList());
     }
@@ -70,7 +69,7 @@ public class ItemServiceImpl implements ItemService {
 
     private void isExistsItemById(Long id) {
         itemRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(String.format("User id=%s не найден", id)));
+                .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не найден", id)));
     }
 }
 

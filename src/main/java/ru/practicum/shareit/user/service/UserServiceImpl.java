@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+//@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper mapper;
@@ -38,6 +38,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto add(UserDto userDto) {
+        if (userRepository.findByEmailContainingIgnoreCase(userDto.getEmail()).size() != 0) {
+            throw new RuntimeException(String.format("User с email = %s уже существует", userDto.getEmail()));
+        }
         User user = userRepository.save(mapper.toUser(userDto, 0L));
         log.debug("Добавлен user {}", user);
         return mapper.toUserDto(user);
@@ -48,9 +51,9 @@ public class UserServiceImpl implements UserService {
     public UserDto update(UserDto userDto, Long id) {
         isExistsUserById(id);
         User user = mapper.toUser(userDto, id);
-        userRepository.updateNameAndEmailById(user.getName(), user.getEmail(), user.getId());
-        log.debug("Обновлен user {}", user);
-        return mapper.toUserDto(user);
+        User userUpdate = userRepository.update(user);
+        log.debug("Обновлен user {}", userUpdate);
+        return mapper.toUserDto(userUpdate);
     }
 
     @Override

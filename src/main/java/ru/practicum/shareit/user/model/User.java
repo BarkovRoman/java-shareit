@@ -4,8 +4,8 @@ import lombok.*;
 
 import javax.persistence.*;
 
-//@Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Setter @Getter @ToString
 @Entity
 @Table(name = "users", schema = "public")
@@ -17,10 +17,6 @@ public class User {
     private Long id;
     @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
-
-    public User() {
-
-    }
 }
