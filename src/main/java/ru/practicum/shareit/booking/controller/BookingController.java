@@ -1,12 +1,47 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.service.BookingService;
 
-/**
- * TODO Sprint add-bookings.
- */
+import java.util.List;
+
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(path = "/bookings")
 public class BookingController {
+    private final BookingService bookingService;
+
+    @PostMapping
+    public BookingDto add(@RequestHeader("X-Sharer-User-Id") Long userId,
+                          @RequestBody BookingDto bookingDto) {
+        return bookingService.add(bookingDto, userId);
+    }
+
+    @PatchMapping("/{bookingId}/approved")
+    public BookingDto update(@RequestHeader("X-Sharer-User-Id") Long userId,
+                             @RequestParam Boolean approved,
+                             @PathVariable Long bookingId) {
+        return bookingService.update(userId, bookingId, approved);
+    }
+
+    @GetMapping("/{bookingId}")
+    public BookingDto getById(@RequestHeader("X-Sharer-User-Id") Long userId,
+                              @PathVariable Long bookingId) {
+        return bookingService.getById(userId, bookingId);
+    }
+
+    @GetMapping("/state")
+    public List<BookingDto> getAllState(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                        @RequestParam(defaultValue = "ALL", required = false) BookingStatus state) {
+        return bookingService.getAllState(userId, state);
+    }
+
+    @GetMapping("/owner/state")
+    public List<BookingDto> getAllOwner(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                        @RequestParam(defaultValue = "all", required = false) BookingStatus state) {
+        return bookingService.getAllOwner(userId, state);
+    }
 }

@@ -4,11 +4,11 @@ import lombok.*;
 
 import javax.persistence.*;
 
-//@Data
 @Getter @Setter @ToString
-@AllArgsConstructor
+@AllArgsConstructor @NoArgsConstructor
 @Entity
 @Table(name = "items", schema = "public")
+
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,10 +23,6 @@ public class Item {
     //private ItemRequest request; // ссылка на запрос создания вещи другого пользователя
     @Column(name = "owner_id")
     private Long owner;
-
-    public Item() {
-
-    }
 
     @Override
     public boolean equals(Object o) {

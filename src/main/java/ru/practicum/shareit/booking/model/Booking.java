@@ -1,23 +1,22 @@
 package ru.practicum.shareit.booking.model;
 
-import lombok.Data;
-import ru.practicum.shareit.booking.BookingStatus;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
+import lombok.*;
 
-import javax.validation.constraints.PastOrPresent;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
+@Getter @Setter @ToString
+@AllArgsConstructor @NoArgsConstructor
+@Entity
+@Table(name = "bookings", schema = "public")
+
 public class Booking {
-    private long id;
-
-    @PastOrPresent(message = "start не может быть раньше текущего времени ")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private LocalDateTime start;    // Дата и время начала бронирования
-
-    @PastOrPresent(message = "end не может быть раньше текущего времени ")
     private LocalDateTime end;    // Дата и время конца бронирования;
-    private Item item;
-    private User booker;    // Пользователь, который осуществляет бронирование
+    private Long itemId;
+    private Long bookerId;    // Пользователь, который осуществляет бронирование
     private BookingStatus status;
 }
