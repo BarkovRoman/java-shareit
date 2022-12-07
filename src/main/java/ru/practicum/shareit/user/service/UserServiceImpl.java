@@ -37,9 +37,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto add(UserDto userDto) {
-        if (userRepository.findByEmailContainingIgnoreCase(userDto.getEmail()).size() != 0) {
+        /*if (userRepository.findByEmailContainingIgnoreCase(userDto.getEmail()).size() != 0) {
             throw new RuntimeException(String.format("User с email = %s уже существует", userDto.getEmail()));
-        }
+        }*/
         User user = userRepository.save(mapper.toUser(userDto, 0L));
         log.debug("Добавлен user {}", user);
         return mapper.toUserDto(user);
