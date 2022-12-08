@@ -2,18 +2,25 @@ package ru.practicum.shareit.booking.dto;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE )
 public interface BookingMapper {
-    @Mapping(target = "itemId", source = "itemId")
-    BookingDto toBookingDto(Booking booking, Long itemId);
+
     @Mapping(target = "status", defaultValue = "WAITING")
-    @Mapping(target = "bookerId", source = "userId")
-    Booking toBooking(BookingDto bookingDto, Long userId);
-    BookingResponseDto bookingToBookingResponseDto(Booking booking);
+    @Mapping(target = "booker", source = "booker")
+    @Mapping(target = "item", source = "item")
+    @Mapping(target = "id", ignore = true)
+    Booking toBooking(BookingDto bookingDto, Item item, User booker);
+
+    //@Mapping(target = "itemId", ignore = true)
+    BookingDto toBookingDto(Booking booking, Long itemId);
+    @Mapping(target = "item", source = "item")
+    @Mapping(target = "id", source = "id")
+    BookingResponseDto bookingToBookingResponseDto(Booking booking, ItemResponseDto item, Long id);
 
 
 }
