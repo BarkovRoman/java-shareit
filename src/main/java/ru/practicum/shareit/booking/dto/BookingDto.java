@@ -5,7 +5,6 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Value
@@ -15,9 +14,6 @@ public class BookingDto {
     LocalDateTime start;
     @Future(message = "end не может быть раньше текущего времени ")
     LocalDateTime end;
-    @NotNull
-    Long itemId;
     BookingStatus status;
-    Long bookerId;
-    String itemName;
+    Long itemId;
 }

@@ -33,9 +33,9 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleExistingEmailException(final ExistingEmailException e) {
-        log.warn("Ошибка 500 {}", e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<String> handleExistingEmailException(final ExistingValidationException e) {
+        log.warn("Ошибка 400 {}", e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
