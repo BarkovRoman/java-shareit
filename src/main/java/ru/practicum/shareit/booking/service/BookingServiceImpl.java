@@ -24,7 +24,6 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final BookingMapper mapper;
-    private final ItemShortResponseDto itemMapper;
 
     @Override
     public BookingResponseDto add(BookingDto bookingDto, Long userId) {
@@ -33,34 +32,44 @@ public class BookingServiceImpl implements BookingService {
             throw new ExistingValidationException(String.format("start =%s позже end =%s", bookingDto.getStart(), bookingDto.getEnd()));
         }
         Item item = isExistsAvailableItem(bookingDto.getItemId());
-        ItemResponseDto itemN = itemMapper.toItem(item);
         Booking booking = bookingRepository.save(mapper.toBooking(bookingDto, item, user));
-        BookingResponseDto bookingResponse = mapper.bookingToBookingResponseDto(booking, itemN, booking.getId());
-
+        BookingResponseDto bookingResponse = mapper.bookingToBookingResponseDto(
+                booking,
+                mapper.itemResponseDto(item),
+                mapper.bookerResponseDto(user),
+                booking.getId());
         log.debug("Добавлен Booking {}", booking);
         return bookingResponse;
     }
 
     @Override
-    public BookingDto update(Long userId, Long bookingId, Boolean approved) {
-        isExistsUserById(userId);
+    public BookingResponseDto update(Long userId, Long bookingId, Boolean approved) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не найден", bookingId)));
+        User user = isExistsUserById(booking.getBooker().getId());
         if (approved) booking.setStatus(BookingStatus.APPROVED);
         if (!approved) booking.setStatus(BookingStatus.REJECTED);
         bookingRepository.save(booking);
         Item item = isExistsAvailableItem(booking.getItem().getId());
         log.debug("Обновление Booking {}", booking);
-        return mapper.toBookingDto(booking, userId);
+        return mapper.bookingToBookingResponseDto(
+                booking,
+                mapper.itemResponseDto(item),
+                mapper.bookerResponseDto(user),
+                booking.getId());
     }
 
     @Override
-    public BookingDto getById(Long userId, Long bookingId) {
-        isExistsUserById(userId);
+    public BookingResponseDto getById(Long userId, Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не найден", bookingId)));
+        User user = isExistsUserById(booking.getBooker().getId());
         Item item = isExistsAvailableItem(booking.getItem().getId());
-        return mapper.toBookingDto(booking, userId);
+        return mapper.bookingToBookingResponseDto(
+                booking,
+                mapper.itemResponseDto(item),
+                mapper.bookerResponseDto(user),
+                booking.getId());
     }
 
     @Override

@@ -23,14 +23,14 @@ public class BookingController {
     }
 
     @PatchMapping("/{bookingId}")
-    public BookingDto update(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public BookingResponseDto update(@RequestHeader("X-Sharer-User-Id") Long userId,
                              @RequestParam Boolean approved,
                              @PathVariable Long bookingId) {
         return bookingService.update(userId, bookingId, approved);
     }
 
     @GetMapping("/{bookingId}")
-    public BookingDto getById(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public BookingResponseDto getById(@RequestHeader("X-Sharer-User-Id") Long userId,
                               @PathVariable Long bookingId) {
         return bookingService.getById(userId, bookingId);
     }

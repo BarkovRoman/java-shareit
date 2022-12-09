@@ -15,12 +15,12 @@ public interface BookingMapper {
     @Mapping(target = "item", source = "item")
     @Mapping(target = "id", ignore = true)
     Booking toBooking(BookingDto bookingDto, Item item, User booker);
-
-    //@Mapping(target = "itemId", ignore = true)
-    BookingDto toBookingDto(Booking booking, Long itemId);
+    //BookingDto toBookingDto(Booking booking, Long itemId);
     @Mapping(target = "item", source = "item")
     @Mapping(target = "id", source = "id")
-    BookingResponseDto bookingToBookingResponseDto(Booking booking, ItemResponseDto item, Long id);
+    @Mapping(target = "booker", source = "booker")
+    BookingResponseDto bookingToBookingResponseDto(Booking booking, ItemResponseDto item, BookerResponseDto booker,  Long id);
 
-
+    ItemResponseDto itemResponseDto(Item item);
+    BookerResponseDto bookerResponseDto(User booker);
 }

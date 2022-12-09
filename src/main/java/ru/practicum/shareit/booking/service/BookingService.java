@@ -9,9 +9,9 @@ import java.util.List;
 public interface BookingService {
     BookingResponseDto add(BookingDto bookingDto, Long userId);
 
-    BookingDto update(Long userId, Long bookingId, Boolean approved);
+    BookingResponseDto update(Long userId, Long bookingId, Boolean approved);
 
-    BookingDto getById(Long userId, Long bookingId);
+    BookingResponseDto getById(Long userId, Long bookingId);
 
     List<BookingDto> getByBookerIdAndState(Long userId, BookingStatus state);
 
