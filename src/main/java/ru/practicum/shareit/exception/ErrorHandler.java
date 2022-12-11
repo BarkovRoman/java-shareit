@@ -1,6 +1,7 @@
 package ru.practicum.shareit.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -73,4 +74,10 @@ public class ErrorHandler {
         log.warn(String.valueOf(result), exception);
         return result;
     }
+
+    /*@ExceptionHandler
+    public ResponseEntity<String> handleConversionFailedException(ConversionFailedException e) {
+        log.warn("Ошибка сервера 500 {}", e.getMessage());
+        return new ResponseEntity<>("UNSUPPORTED_STATUS", HttpStatus.INTERNAL_SERVER_ERROR);
+    }*/
 }

@@ -15,6 +15,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -33,71 +34,52 @@ public class BookingServiceImpl implements BookingService {
         }
         Item item = isExistsAvailableItem(bookingDto.getItemId());
         Booking booking = bookingRepository.save(mapper.toBooking(bookingDto, item, user));
-        BookingResponseDto bookingResponse = mapper.bookingToBookingResponseDto(
-                booking,
-                mapper.itemResponseDto(item),
-                mapper.bookerResponseDto(user),
-                booking.getId());
         log.debug("Добавлен Booking {}", booking);
-        return bookingResponse;
+        return mapper.bookingToBookingResponseDto(booking);
     }
 
     @Override
     public BookingResponseDto update(Long userId, Long bookingId, Boolean approved) {
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не найден", bookingId)));
-        User user = isExistsUserById(booking.getBooker().getId());
+                .orElseThrow(() -> new NotFoundException(String.format("Booking id=%s не найден", bookingId)));
+        if (!booking.getItem().getOwner().equals(userId)) {
+            throw new NotFoundException(String.format("Item id=%s не пренадлежит User id=%s", bookingId, userId));
+        }
         if (approved) booking.setStatus(BookingStatus.APPROVED);
         if (!approved) booking.setStatus(BookingStatus.REJECTED);
         bookingRepository.save(booking);
-        Item item = isExistsAvailableItem(booking.getItem().getId());
         log.debug("Обновление Booking {}", booking);
-        return mapper.bookingToBookingResponseDto(
-                booking,
-                mapper.itemResponseDto(item),
-                mapper.bookerResponseDto(user),
-                booking.getId());
+        return mapper.bookingToBookingResponseDto(booking);
     }
 
     @Override
     public BookingResponseDto getById(Long userId, Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не найден", bookingId)));
-        User user = isExistsUserById(booking.getBooker().getId());
-        Item item = isExistsAvailableItem(booking.getItem().getId());
-        return mapper.bookingToBookingResponseDto(
-                booking,
-                mapper.itemResponseDto(item),
-                mapper.bookerResponseDto(user),
-                booking.getId());
+                .orElseThrow(() -> new NotFoundException(String.format("Booking id=%s не найден", bookingId)));
+        if (booking.getBooker().getId().equals(userId) || booking.getItem().getOwner().equals(userId)) {
+            return mapper.bookingToBookingResponseDto(booking);
+        }
+        throw new NotFoundException(String.format(
+                "Booking id=%s не пренадлежит User id=%s", bookingId, userId));
     }
 
     @Override
-    public List<BookingDto> getByBookerIdAndState(Long userId, BookingStatus state) {
+    public List<BookingResponseDto> getByBookerIdAndState(Long userId, BookingStatus state) {
         isExistsUserById(userId);
-        /*if (state.toString().equals("ALL")) {
-            return bookingRepository.findByBookerId(userId).stream()
-                    .map(mapper::toBookingDto)
-                    .collect(Collectors.toList());
-        }*/
-        /*return bookingRepository.findByBookerIdAndStatus(userId, state).stream()
-                .map(mapper::toBookingDto)
-                .collect(Collectors.toList());*/
-        return null;
+        return bookingRepository.findByBookerIdOrderByEndDesc(userId).stream()
+                .map(mapper::bookingToBookingResponseDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<BookingDto> getAllOwnerId(Long userId, BookingStatus state) {
+    public List<BookingResponseDto> getAllOwnerId(Long userId, BookingStatus state) {
         isExistsUserById(userId);
-       /* if (state.toString().equals("ALL")) {
-            return bookingRepository.findByBookerId(userId).stream()
-                    .map(mapper::toBookingDto)
-                    .collect(Collectors.toList());
-        }*/
-        /*return bookingRepository.findByBookerIdAndStatus(userId, state).stream()
-                .map(mapper::toBookingDto)
-                .collect(Collectors.toList());*/
-        return null;
+
+        List<Booking> bookings = bookingRepository.findByOwnerId(userId);
+
+        return bookings.stream()
+                .map(mapper::bookingToBookingResponseDto)
+                .collect(Collectors.toList());
     }
 
     private User isExistsUserById(Long id) {

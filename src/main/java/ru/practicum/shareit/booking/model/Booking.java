@@ -23,17 +23,12 @@ public class Booking {
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "booker_id")
     User booker;
     @ManyToOne
     @JoinColumn(name = "item_id")
     Item item;
-
-   /* @Column(name = "item_id")
-    private Long itemId;
-    @Column(name = "booker_id")
-    private Long bookerId;    // Пользователь, который осуществляет бронирование*/
 
     @Override
     public boolean equals(Object o) {

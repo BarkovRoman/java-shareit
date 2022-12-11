@@ -4,6 +4,8 @@ import lombok.*;
 import ru.practicum.shareit.item.model.Item;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
