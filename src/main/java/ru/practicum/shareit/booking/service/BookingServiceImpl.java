@@ -69,11 +69,12 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> getByBookerIdAndState(Long userId, BookingStatus state) {
+    public List<BookingResponseDto> getByBookerIdAndState(Long userId, String state) {
         isExistsUserById(userId);
-        isExistsStatus(state);
-        if (state.equals(BookingStatus.WAITING) || state.equals(BookingStatus.REJECTED)) {
-            return bookingRepository.findByBookerIdAndStatusOrderByEndDesc(userId, state).stream()
+        BookingStatus status = isExistsStatus(state);
+
+        if (!status.equals(BookingStatus.ALL)) {
+            return bookingRepository.findByBookerIdAndStatusOrderByEndDesc(userId, status).stream()
                     .map(mapper::bookingToBookingResponseDto)
                     .collect(Collectors.toList());
         }
@@ -83,15 +84,15 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> getAllOwnerId(Long userId, BookingStatus state) {
+    public List<BookingResponseDto> getAllOwnerId(Long userId, String state) {
         isExistsUserById(userId);
-        isExistsStatus(state);
+        BookingStatus status = isExistsStatus(state);
 
-       if (state.equals(BookingStatus.WAITING) || state.equals(BookingStatus.REJECTED)) {
-           return bookingRepository.findByOwnerIdAndStatus(userId, state).stream()
-                   .map(mapper::bookingToBookingResponseDto)
-                   .collect(Collectors.toList());
-       }
+        if (!status.equals(BookingStatus.ALL)) {
+            return bookingRepository.findByOwnerIdAndStatus(userId, status).stream()
+                    .map(mapper::bookingToBookingResponseDto)
+                    .collect(Collectors.toList());
+        }
         return bookingRepository.findByOwnerId(userId).stream()
                 .map(mapper::bookingToBookingResponseDto)
                 .collect(Collectors.toList());
@@ -109,14 +110,23 @@ public class BookingServiceImpl implements BookingService {
             throw new ExistingValidationException(String.format("Item id=%s заблокирован для бронирования", itemId));
         }
         if (item.getOwner().equals(userId)) {
-            throw new NotFoundException(String.format("User id=%s не может забронировать Item id=%s",userId, itemId));
+            throw new NotFoundException(String.format("User id=%s не может забронировать Item id=%s", userId, itemId));
         }
         return item;
     }
 
-    private void isExistsStatus (BookingStatus status) {
-        if (!Arrays.asList(BookingStatus.values()).contains(status)) {
-            throw new IllegalRequestException("UNSUPPORTED_STATUS");
-        }
+    private BookingStatus isExistsStatus(String status) {
+        if (status.equals(BookingStatus.CURRENT.toString())) return BookingStatus.REJECTED;
+        if (status.equals(BookingStatus.REJECTED.toString())) return BookingStatus.REJECTED;
+
+        if (status.equals(BookingStatus.APPROVED.toString())) return BookingStatus.APPROVED;
+        if (status.equals(BookingStatus.PAST.toString())) return BookingStatus.APPROVED;
+
+        if (status.equals(BookingStatus.WAITING.toString())) return BookingStatus.WAITING;
+
+        if (status.equals(BookingStatus.ALL.toString())) return BookingStatus.ALL;
+        if (status.equals(BookingStatus.FUTURE.toString())) return BookingStatus.ALL;
+
+        throw new IllegalRequestException("Unknown state: UNSUPPORTED_STATUS");
     }
 }

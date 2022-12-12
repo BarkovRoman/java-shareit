@@ -3,6 +3,8 @@ package ru.practicum.shareit.item.dto;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 
+import java.util.List;
+
 @Value
 @AllArgsConstructor
 public class ItemBookingDto {
@@ -12,6 +14,8 @@ public class ItemBookingDto {
     Boolean available;
     LastNextItemResponseDto lastBooking;
     LastNextItemResponseDto nextBooking;
+
+    List<CommentResponseDto> comments;
 
 
 
