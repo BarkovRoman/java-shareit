@@ -5,6 +5,6 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
-public class IllegalRequestException extends RuntimeException{
+public class IllegalRequestException extends RuntimeException {
     private final String error;
 }

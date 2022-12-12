@@ -1,15 +1,14 @@
 package ru.practicum.shareit.user.model;
 
 import lombok.*;
-import ru.practicum.shareit.item.model.Item;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter @Getter @ToString
+@Setter
+@Getter
+@ToString
 @Entity
 @Table(name = "users", schema = "public")
 public class User {

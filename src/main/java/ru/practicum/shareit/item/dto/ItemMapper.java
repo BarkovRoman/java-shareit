@@ -16,15 +16,18 @@ public interface ItemMapper {
     Item toItem(ItemDto itemDto, Long userId, Long itemId);
 
     ItemDto toItemDto(Item item);
+
     @Mapping(target = "id", source = "id")
     @Mapping(target = "lastBooking", source = "lastBooking")
     @Mapping(target = "nextBooking", source = "nextBooking")
     @Mapping(target = "comments", source = "comments")
     ItemBookingDto toItemBookingDto(Item item, LastNextItemShortDto lastBooking, LastNextItemShortDto nextBooking, Long id, List<CommentShortResponseDto> comments);
+
     @Mapping(target = "author", source = "user")
     @Mapping(target = "item", source = "item")
     @Mapping(target = "id", ignore = true)
     Comment toComment(CommentDto commentDto, Item item, User user);
+
     @Mapping(target = "authorName", source = "author")
     CommentResponseDto toCommentResponseDto(Comment comment, String author);
 

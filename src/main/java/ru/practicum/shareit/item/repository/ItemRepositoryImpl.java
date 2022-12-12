@@ -7,9 +7,11 @@ import ru.practicum.shareit.item.model.Item;
 public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
     private final ItemRepository itemRepository;
+
     public ItemRepositoryImpl(@Lazy ItemRepository itemRepository)  {
         this.itemRepository = itemRepository;
     }
+    
     public Item update(Long userId, Long itemId, Item item) {
         Item itemUpdate = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не найден", itemId)));

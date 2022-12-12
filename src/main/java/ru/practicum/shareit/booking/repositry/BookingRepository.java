@@ -7,12 +7,12 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.dto.LastNextItemShortDto;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByBookerIdOrderByEndDesc(Long userId);
+
     List<Booking> findByBookerIdAndStatusOrderByEndDesc(Long userId, BookingStatus status);
 
     List<Booking> findByBooker_IdAndStatusAndEndBeforeOrderByEndDesc(Long userId, BookingStatus status, LocalDateTime end);

@@ -54,7 +54,7 @@ public class ItemServiceImpl implements ItemService {
         isExistsUserById(userId);
         List<Item> items = itemRepository.findByOwner(userId);
         return items.stream()
-                .map(f-> getById(f.getId(), userId))
+                .map(f -> getById(f.getId(), userId))
                 .collect(Collectors.toList());
     }
 

@@ -7,7 +7,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE )
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface BookingMapper {
 
     @Mapping(target = "status", defaultValue = "WAITING")
@@ -19,5 +19,6 @@ public interface BookingMapper {
     BookingResponseDto bookingToBookingResponseDto(Booking booking);
 
     ItemResponseDto itemResponseDto(Item item);
+
     BookerResponseDto bookerResponseDto(User booker);
 }

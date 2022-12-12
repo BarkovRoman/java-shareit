@@ -6,8 +6,11 @@ import java.time.LocalDateTime;
 
 public interface CommentShortResponseDto {
     Long getId();
+
     String getText();
+
     @Value("#{target.author.name}")
     String getAuthorName();
+
     LocalDateTime getCreated();
 }
