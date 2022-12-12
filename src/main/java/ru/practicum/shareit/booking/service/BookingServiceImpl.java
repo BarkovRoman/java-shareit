@@ -72,6 +72,11 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingResponseDto> getByBookerIdAndState(Long userId, BookingStatus state) {
         isExistsUserById(userId);
         isExistsStatus(state);
+        if (state.equals(BookingStatus.WAITING) || state.equals(BookingStatus.REJECTED)) {
+            return bookingRepository.findByBookerIdAndStatusOrderByEndDesc(userId, state).stream()
+                    .map(mapper::bookingToBookingResponseDto)
+                    .collect(Collectors.toList());
+        }
         return bookingRepository.findByBookerIdOrderByEndDesc(userId).stream()
                 .map(mapper::bookingToBookingResponseDto)
                 .collect(Collectors.toList());
@@ -82,9 +87,12 @@ public class BookingServiceImpl implements BookingService {
         isExistsUserById(userId);
         isExistsStatus(state);
 
-        List<Booking> bookings = bookingRepository.findByOwnerId(userId);
-
-        return bookings.stream()
+       if (state.equals(BookingStatus.WAITING) || state.equals(BookingStatus.REJECTED)) {
+           return bookingRepository.findByOwnerIdAndStatus(userId, state).stream()
+                   .map(mapper::bookingToBookingResponseDto)
+                   .collect(Collectors.toList());
+       }
+        return bookingRepository.findByOwnerId(userId).stream()
                 .map(mapper::bookingToBookingResponseDto)
                 .collect(Collectors.toList());
     }

@@ -45,13 +45,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getByUser(Long userId) {
+    public List<ItemBookingDto> getByUser(Long userId) {
         isExistsUserById(userId);
-        List<Item> items = bookingRepository.findByOwnerIdBooker(userId);
-
-        return itemRepository.findByOwner(userId).stream()   // findAllByOwnerOrderByIdAsc(userId)
-                .map(mapper::toItemDto)
-
+        List<Item> items = itemRepository.findByOwner(userId);
+        return items.stream()
+                .map(f-> getById(f.getId(), userId))
                 .collect(Collectors.toList());
     }
 

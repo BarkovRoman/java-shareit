@@ -30,7 +30,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getByUser(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<ItemBookingDto> getByUser(@RequestHeader("X-Sharer-User-Id") Long userId) {
         return itemService.getByUser(userId);
     }
 
