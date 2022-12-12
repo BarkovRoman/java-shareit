@@ -3,13 +3,14 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.repositry.BookingRepository;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final BookingRepository bookingRepository;
     private final ItemMapper mapper;
 
     @Override
@@ -42,17 +44,26 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getByUser(Long userId) {
+    public List<ItemBookingDto> getByUser(Long userId) {
         isExistsUserById(userId);
         return itemRepository.findByOwner(userId).stream()
+                .map(p - > getById(, userId))
                 .map(mapper::toItemDto)
+
                 .collect(Collectors.toList());
     }
 
     @Override
-    public ItemDto getById(Long itemId) {
-        return mapper.toItemDto(itemRepository.findById(itemId)
-                .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не найден", itemId))));
+    public ItemBookingDto getById(Long itemId, Long userId) {
+        LinkedList<LastNextItemShortDto> bookings = bookingRepository.getBookingByItem(itemId, userId);
+        if (bookings.size() == 0) {
+            return mapper.toItemBookingDto(itemRepository.findById(itemId)
+                            .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не найден", itemId))),
+                    null, null, itemId);
+        }
+        return mapper.toItemBookingDto(itemRepository.findById(itemId)
+                        .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не найден", itemId))),
+                bookings.getFirst(), bookings.getLast(), itemId);
     }
 
     @Override

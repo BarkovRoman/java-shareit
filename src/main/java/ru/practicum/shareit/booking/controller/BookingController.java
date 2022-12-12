@@ -9,9 +9,12 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.service.BookingService;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
+@Valid
 @RequiredArgsConstructor
 @RequestMapping(path = "/bookings")
 public class BookingController {
@@ -25,7 +28,7 @@ public class BookingController {
 
     @PatchMapping("/{bookingId}")
     public BookingResponseDto update(@RequestHeader("X-Sharer-User-Id") Long userId,
-                             @RequestParam Boolean approved,
+                             @RequestParam @NotNull(message = "RequestParam не передан") Boolean approved,
                              @PathVariable Long bookingId) {
         return bookingService.update(userId, bookingId, approved);
     }
@@ -44,7 +47,7 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<BookingResponseDto> getAllOwnerId(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                        @RequestParam(defaultValue = "ALL", required = false) BookingStatus state) {
+                                        @RequestParam(defaultValue = "ALL", required = false) @Validated({BookingStatus.class}) BookingStatus state) {
         return bookingService.getAllOwnerId(userId, state);
     }
 }

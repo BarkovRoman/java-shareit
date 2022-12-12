@@ -1,7 +1,6 @@
 package ru.practicum.shareit.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -34,12 +33,6 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleExistingEmailException(final ExistingValidationException e) {
-        log.warn("Ошибка 400 {}", e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
         Map<String, String> result = exception.getFieldErrors().stream()
@@ -59,14 +52,6 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handleNotFoundException(NotFoundException exception) {
-        Map<String, String> result = Map.of("Ошибка не найденно", exception.getMessage());
-        log.warn(String.valueOf(result), exception);
-        return result;
-    }
-
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception) {
         String message = exception.getMessage();
@@ -75,9 +60,26 @@ public class ErrorHandler {
         return result;
     }
 
-    /*@ExceptionHandler
-    public ResponseEntity<String> handleConversionFailedException(ConversionFailedException e) {
-        log.warn("Ошибка сервера 500 {}", e.getMessage());
-        return new ResponseEntity<>("UNSUPPORTED_STATUS", HttpStatus.INTERNAL_SERVER_ERROR);
-    }*/
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleIllegalRequestException(IllegalRequestException e) {   // 400 BAD_REQUEST
+        String message = e.getMessage();
+        Map<String, String> result = Map.of("Unknown state:", Objects.isNull(message) ? "Неизвестно" : message);
+        log.warn(String.valueOf(result), e);
+        return result;
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleExistingValidationException(final ExistingValidationException e) {
+        log.warn("Ошибка 400 {}", e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleNotFoundException(NotFoundException exception) {      // 404 NOT_FOUND
+        Map<String, String> result = Map.of("Ошибка ", exception.getMessage());
+        log.warn(String.valueOf(result), exception);
+        return result;
+    }
 }
