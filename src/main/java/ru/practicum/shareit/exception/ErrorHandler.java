@@ -62,11 +62,9 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleIllegalRequestException(IllegalRequestException e) {   // 400 BAD_REQUEST
-        String message = e.getMessage();
-        Map<String, String> result = Map.of("Error message", Objects.isNull(message) ? "Неизвестно" : message);
-        log.warn(String.valueOf(result), e);
-        return result;
+    public ErrorResponse handleIllegalRequestException(IllegalRequestException e) {   // 400 BAD_REQUEST
+        log.warn("Ошибка 400 {}", e.getError());
+        return new ErrorResponse(e.getError());
     }
 
     @ExceptionHandler

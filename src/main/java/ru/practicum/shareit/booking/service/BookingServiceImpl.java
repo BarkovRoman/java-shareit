@@ -15,7 +15,7 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.util.Arrays;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,6 +73,12 @@ public class BookingServiceImpl implements BookingService {
         isExistsUserById(userId);
         BookingStatus status = isExistsStatus(state);
 
+        if (status.equals(BookingStatus.PAST)) {
+            return bookingRepository.findByBooker_IdAndStatusAndEndBeforeOrderByEndDesc(userId, BookingStatus.APPROVED, LocalDateTime.now()).stream()
+                    .map(mapper::bookingToBookingResponseDto)
+                    .collect(Collectors.toList());
+        }
+
         if (!status.equals(BookingStatus.ALL)) {
             return bookingRepository.findByBookerIdAndStatusOrderByEndDesc(userId, status).stream()
                     .map(mapper::bookingToBookingResponseDto)
@@ -83,11 +89,17 @@ public class BookingServiceImpl implements BookingService {
                 .collect(Collectors.toList());
     }
 
+
     @Override
     public List<BookingResponseDto> getAllOwnerId(Long userId, String state) {
         isExistsUserById(userId);
         BookingStatus status = isExistsStatus(state);
-
+        if (status.equals(BookingStatus.PAST)) {
+            return bookingRepository.findByOwnerIdAndStatus(userId, BookingStatus.APPROVED).stream()
+                    .filter(f -> f.getEnd().isBefore(LocalDateTime.now()))
+                    .map(mapper::bookingToBookingResponseDto)
+                    .collect(Collectors.toList());
+        }
         if (!status.equals(BookingStatus.ALL)) {
             return bookingRepository.findByOwnerIdAndStatus(userId, status).stream()
                     .map(mapper::bookingToBookingResponseDto)
@@ -120,7 +132,7 @@ public class BookingServiceImpl implements BookingService {
         if (status.equals(BookingStatus.REJECTED.toString())) return BookingStatus.REJECTED;
 
         if (status.equals(BookingStatus.APPROVED.toString())) return BookingStatus.APPROVED;
-        if (status.equals(BookingStatus.PAST.toString())) return BookingStatus.APPROVED;
+        if (status.equals(BookingStatus.PAST.toString())) return BookingStatus.PAST;
 
         if (status.equals(BookingStatus.WAITING.toString())) return BookingStatus.WAITING;
 
@@ -130,3 +142,4 @@ public class BookingServiceImpl implements BookingService {
         throw new IllegalRequestException("Unknown state: UNSUPPORTED_STATUS");
     }
 }
+

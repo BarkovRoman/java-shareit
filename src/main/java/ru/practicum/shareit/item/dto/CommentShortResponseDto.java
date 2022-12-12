@@ -8,6 +8,6 @@ public interface CommentShortResponseDto {
     Long getId();
     String getText();
     @Value("#{target.author.name}")
-    String getName();
+    String getAuthorName();
     LocalDateTime getCreated();
 }
