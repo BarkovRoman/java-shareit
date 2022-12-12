@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repositry.BookingRepository;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.*;
@@ -44,10 +45,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemBookingDto> getByUser(Long userId) {
+    public List<ItemDto> getByUser(Long userId) {
         isExistsUserById(userId);
-        return itemRepository.findByOwner(userId).stream()
-                .map(p - > getById(, userId))
+        List<Item> items = bookingRepository.findByOwnerIdBooker(userId);
+
+        return itemRepository.findByOwner(userId).stream()   // findAllByOwnerOrderByIdAsc(userId)
                 .map(mapper::toItemDto)
 
                 .collect(Collectors.toList());
