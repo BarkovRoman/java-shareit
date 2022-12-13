@@ -29,7 +29,7 @@ public class ErrorHandler {
     @ExceptionHandler
     public ResponseEntity<String> handleThrowable(final Throwable e) {
         log.warn("Ошибка сервера 500 {}", e.getMessage());
-        return new ResponseEntity<>("Произошла непредвиденная ошибка сервера", HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler
