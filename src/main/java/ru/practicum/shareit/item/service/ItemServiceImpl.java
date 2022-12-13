@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
@@ -14,13 +15,16 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Slf4j
 @Service
@@ -73,9 +77,18 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemBookingDto> getByUser(Long userId) {
         isExistsUserById(userId);
         List<Item> items = itemRepository.findByOwner(userId);
+        //LinkedList<LastNextItemShortDto> bookings = bookingRepository.getBookingByItem(itemId, userId);
+        Map<Item, List<Comment>> comments = commentRepository.findByItemIn(items, Sort.by(DESC, "created"))
+                .stream()//collect(groupingBy(CommentShortResponseDto::g, toList()))
+                .collect(groupingBy(Comment::getItem, toList()));
+        /*comments.entrySet().stream().map(f -> mapper.toItemBookingDto(f.getKey(),
+                null,
+                null,
+                f.getKey().getId(),
+                f.getValue().stream().map(CommentShortResponseDto::new).collect(Collectors.toList())));*/
         return items.stream()
                 .map(f -> getById(f.getId(), userId))
-                .collect(Collectors.toList());
+                .collect(toList());
     }
  /* Следует получить комментарии всех вещей, которые будут возвращены вне цикла и разбить их на мапу,
     где ключ - идентификатор вещи, а значение - коллекция из комментариев) Таким образом мы не будем производить n-лишних запросов к БД)
@@ -105,7 +118,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> search(String text) {
         return itemRepository.search(text).stream()
                 .map(mapper::toItemDto)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     @Override
@@ -123,8 +136,8 @@ public class ItemServiceImpl implements ItemService {
         return mapper.toCommentResponseDto(comment, comment.getAuthor().getName());
     }
 
-    private User isExistsUserById(Long id) {
-        return userRepository.findById(id)
+    private void isExistsUserById(Long id) {
+        userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("User id=%s не найден", id)));
     }
 

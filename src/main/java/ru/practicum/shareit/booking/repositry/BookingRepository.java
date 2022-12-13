@@ -8,7 +8,6 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.dto.LastNextItemShortDto;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
