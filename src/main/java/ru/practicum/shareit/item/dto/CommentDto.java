@@ -1,14 +1,16 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
 
 @Value
-@AllArgsConstructor
+@Builder
+@Jacksonized
 public class CommentDto {
     Long id;
     @NotBlank(message = "Комментарий не может быть пустым")
