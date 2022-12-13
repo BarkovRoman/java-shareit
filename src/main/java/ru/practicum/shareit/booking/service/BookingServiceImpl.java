@@ -74,7 +74,9 @@ public class BookingServiceImpl implements BookingService {
         BookingStatus status = isExistsStatus(state);
 
         if (status.equals(BookingStatus.PAST)) {
-            return bookingRepository.findByBooker_IdAndStatusAndEndBeforeOrderByEndDesc(userId, BookingStatus.APPROVED, LocalDateTime.now()).stream()
+            return bookingRepository.findByBooker_IdAndStatusAndEndBeforeOrderByEndDesc(userId,
+                            BookingStatus.APPROVED,
+                            LocalDateTime.now()).stream()
                     .map(mapper::bookingToBookingResponseDto)
                     .collect(Collectors.toList());
         }
