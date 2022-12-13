@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.repositry;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.model.Booking;
@@ -7,15 +8,16 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.dto.LastNextItemShortDto;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    List<Booking> findByBookerIdOrderByEndDesc(Long userId);
+    List<Booking> findByBookerId(Long userId, Sort sort);
 
-    List<Booking> findByBookerIdAndStatusOrderByEndDesc(Long userId, BookingStatus status);
+    List<Booking> findByBookerIdAndStatus(Long userId, BookingStatus status, Sort sort);
 
-    List<Booking> findByBooker_IdAndStatusAndEndBeforeOrderByEndDesc(Long userId, BookingStatus status, LocalDateTime end);
+    List<Booking> findByBooker_IdAndStatusAndEndBefore(Long userId, BookingStatus status, LocalDateTime end, Sort sort);
 
     @Query("select b from Booking b  left join Item i on b.item.id = i.id where i.owner = ?1 order by b.end desc ")
     List<Booking> findByOwnerId(Long userId);
@@ -30,4 +32,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Booking findBookingByItem_IdAndBooker_IdAndStatusAndEndBefore(Long itemId, Long userId, BookingStatus approved, LocalDateTime now);
 
+    @Query("select b from Booking b  left join Item i on b.item.id = i.id where i.owner = ?1 and b.status = ?2 and b.end < ?3 order by b.end desc ")
+    List<Booking> findByOwnerIdAndStatusIsBefore(Long userId, BookingStatus approved, LocalDateTime localDateTime);
 }

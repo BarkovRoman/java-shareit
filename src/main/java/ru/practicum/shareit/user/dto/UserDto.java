@@ -1,16 +1,14 @@
 package ru.practicum.shareit.user.dto;
 
-import lombok.Builder;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import lombok.AllArgsConstructor;
 import lombok.Value;
-import lombok.extern.jackson.Jacksonized;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Value
-@Builder
-@Jacksonized
+@AllArgsConstructor(onConstructor = @__(@JsonCreator))
 public class UserDto {
     Long id;
 
@@ -18,6 +16,6 @@ public class UserDto {
     String name;
 
     @Email(groups = {Create.class, Update.class}, message = "Не верный адрес Email")
-    @NotNull(groups = {Create.class}, message = "Email = null")
+    @NotBlank(groups = {Create.class}, message = "Email = null")
     String email;
 }

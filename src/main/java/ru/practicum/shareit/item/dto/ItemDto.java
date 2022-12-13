@@ -1,15 +1,14 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.Builder;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import lombok.AllArgsConstructor;
 import lombok.Value;
-import lombok.extern.jackson.Jacksonized;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Value
-@Builder
-@Jacksonized
+@AllArgsConstructor(onConstructor = @__(@JsonCreator))
 public class ItemDto {
     Long id;
     @NotBlank
@@ -18,5 +17,4 @@ public class ItemDto {
     String description;
     @NotNull
     Boolean available; // статус доступности
-    Long owner;
 }

@@ -6,12 +6,10 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "items", schema = "public")
-
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,6 +22,7 @@ public class Item {
     private Boolean available; // статус доступности
 
     //private ItemRequest request; // ссылка на запрос создания вещи другого пользователя
+
     @Column(name = "owner_id")
     private Long owner;
 

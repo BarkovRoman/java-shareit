@@ -2,7 +2,9 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.*;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
@@ -15,12 +17,14 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
@@ -28,6 +32,7 @@ public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
     private final BookingMapper mapper;
 
+    @Transactional
     @Override
     public BookingResponseDto add(BookingDto bookingDto, Long userId) {
         User user = isExistsUserById(userId);
@@ -40,6 +45,12 @@ public class BookingServiceImpl implements BookingService {
         return mapper.bookingToBookingResponseDto(booking);
     }
 
+    /*Не забываем так же проверить, что время старта не должно равняться времени окончания)
+
+            (предложение)Эту валидацию можно было бы реализовать с помощью аннотации валидации над классом, чтобы поддерживать декларативный подход https://devcolibri.com/spring-mvc-кастомная-аннотация-для-валидации/
+    Кстати, если будет интересно то, как реализовать кастомную аннотацию валидации на уровне класса BookingDto - можешь чекнуть тут) https://github.com/TyutterinYakov/CustomValidationClassLevel Я написал небольшой примерчик, чтобы было проще разобраться в теме)
+*/
+    @Transactional
     @Override
     public BookingResponseDto update(Long userId, Long bookingId, Boolean approved) {
         Booking booking = bookingRepository.findById(bookingId)
@@ -74,19 +85,20 @@ public class BookingServiceImpl implements BookingService {
         BookingStatus status = isExistsStatus(state);
 
         if (status.equals(BookingStatus.PAST)) {
-            return bookingRepository.findByBooker_IdAndStatusAndEndBeforeOrderByEndDesc(userId,
+            return bookingRepository.findByBooker_IdAndStatusAndEndBefore(userId,
                             BookingStatus.APPROVED,
-                            LocalDateTime.now()).stream()
+                            LocalDateTime.now(),
+                            Sort.by(Sort.Direction.DESC, "end")).stream()
                     .map(mapper::bookingToBookingResponseDto)
                     .collect(Collectors.toList());
         }
 
         if (!status.equals(BookingStatus.ALL)) {
-            return bookingRepository.findByBookerIdAndStatusOrderByEndDesc(userId, status).stream()
+            return bookingRepository.findByBookerIdAndStatus(userId, status, Sort.by(Sort.Direction.DESC, "end")).stream()
                     .map(mapper::bookingToBookingResponseDto)
                     .collect(Collectors.toList());
         }
-        return bookingRepository.findByBookerIdOrderByEndDesc(userId).stream()
+        return bookingRepository.findByBookerId(userId, Sort.by(Sort.Direction.DESC, "end")).stream()
                 .map(mapper::bookingToBookingResponseDto)
                 .collect(Collectors.toList());
     }
@@ -97,8 +109,7 @@ public class BookingServiceImpl implements BookingService {
         isExistsUserById(userId);
         BookingStatus status = isExistsStatus(state);
         if (status.equals(BookingStatus.PAST)) {
-            return bookingRepository.findByOwnerIdAndStatus(userId, BookingStatus.APPROVED).stream()
-                    .filter(f -> f.getEnd().isBefore(LocalDateTime.now()))
+            return bookingRepository.findByOwnerIdAndStatusIsBefore(userId, BookingStatus.APPROVED, LocalDateTime.now()).stream()
                     .map(mapper::bookingToBookingResponseDto)
                     .collect(Collectors.toList());
         }
@@ -130,10 +141,11 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private BookingStatus isExistsStatus(String status) {
-        if (status.equals(BookingStatus.CURRENT.toString())) return BookingStatus.REJECTED;
         if (status.equals(BookingStatus.REJECTED.toString())) return BookingStatus.REJECTED;
 
+        if (status.equals(BookingStatus.CURRENT.toString())) return BookingStatus.REJECTED;
         if (status.equals(BookingStatus.APPROVED.toString())) return BookingStatus.APPROVED;
+
         if (status.equals(BookingStatus.PAST.toString())) return BookingStatus.PAST;
 
         if (status.equals(BookingStatus.WAITING.toString())) return BookingStatus.WAITING;
