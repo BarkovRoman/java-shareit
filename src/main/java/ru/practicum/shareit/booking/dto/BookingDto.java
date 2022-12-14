@@ -5,12 +5,14 @@ import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.exception.validation.StartBeforeEndDateValid;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.FutureOrPresent;
 import java.time.LocalDateTime;
 
 @Value
+@StartBeforeEndDateValid
 @AllArgsConstructor(onConstructor = @__(@JsonCreator))
 public class BookingDto {
     Long id;

@@ -36,20 +36,12 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingResponseDto add(BookingDto bookingDto, Long userId) {
         User user = isExistsUserById(userId);
-        if (bookingDto.getEnd().isBefore(bookingDto.getStart())) {
-            throw new ExistingValidationException(String.format("start =%s позже end =%s", bookingDto.getStart(), bookingDto.getEnd()));
-        }
         Item item = isExistsAvailableItem(bookingDto.getItemId(), userId);
         Booking booking = bookingRepository.save(mapper.toBooking(bookingDto, item, user));
         log.debug("Добавлен Booking {}", booking);
         return mapper.bookingToBookingResponseDto(booking);
     }
 
-    /*Не забываем так же проверить, что время старта не должно равняться времени окончания)
-
-            (предложение)Эту валидацию можно было бы реализовать с помощью аннотации валидации над классом, чтобы поддерживать декларативный подход https://devcolibri.com/spring-mvc-кастомная-аннотация-для-валидации/
-    Кстати, если будет интересно то, как реализовать кастомную аннотацию валидации на уровне класса BookingDto - можешь чекнуть тут) https://github.com/TyutterinYakov/CustomValidationClassLevel Я написал небольшой примерчик, чтобы было проще разобраться в теме)
-*/
     @Transactional
     @Override
     public BookingResponseDto update(Long userId, Long bookingId, Boolean approved) {
@@ -141,19 +133,21 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private BookingStatus isExistsStatus(String status) {
-        if (status.equals(BookingStatus.REJECTED.toString())) return BookingStatus.REJECTED;
-
-        if (status.equals(BookingStatus.CURRENT.toString())) return BookingStatus.REJECTED;
-        if (status.equals(BookingStatus.APPROVED.toString())) return BookingStatus.APPROVED;
-
-        if (status.equals(BookingStatus.PAST.toString())) return BookingStatus.PAST;
-
-        if (status.equals(BookingStatus.WAITING.toString())) return BookingStatus.WAITING;
-
-        if (status.equals(BookingStatus.ALL.toString())) return BookingStatus.ALL;
-        if (status.equals(BookingStatus.FUTURE.toString())) return BookingStatus.ALL;
-
-        throw new IllegalRequestException("Unknown state: UNSUPPORTED_STATUS");
+        switch (status) {
+            case ("REJECTED") :
+            case ("CURRENT") :
+                return BookingStatus.REJECTED;
+            case ("APPROVED") :
+                return BookingStatus.APPROVED;
+            case ("PAST") :
+                return BookingStatus.PAST;
+            case ("WAITING") :
+                return BookingStatus.WAITING;
+            case ("ALL") :
+            case ("FUTURE") :
+                return BookingStatus.ALL;
+            default: throw new IllegalRequestException("Unknown state: UNSUPPORTED_STATUS");
+        }
     }
 }
 

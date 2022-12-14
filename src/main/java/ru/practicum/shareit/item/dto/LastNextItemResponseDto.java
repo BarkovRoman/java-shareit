@@ -7,5 +7,5 @@ import lombok.Value;
 @AllArgsConstructor
 public class LastNextItemResponseDto {
     Long id;
-    long bookerId;
+    Long bookerId;
 }

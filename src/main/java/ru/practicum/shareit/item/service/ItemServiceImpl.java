@@ -18,12 +18,10 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
+import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Slf4j
@@ -77,28 +75,31 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemBookingDto> getByUser(Long userId) {
         isExistsUserById(userId);
         List<Item> items = itemRepository.findByOwner(userId);
-        //LinkedList<LastNextItemShortDto> bookings = bookingRepository.getBookingByItem(itemId, userId);
         Map<Item, List<Comment>> comments = commentRepository.findByItemIn(items, Sort.by(DESC, "created"))
-                .stream()//collect(groupingBy(CommentShortResponseDto::g, toList()))
+                .stream()
                 .collect(groupingBy(Comment::getItem, toList()));
-        /*comments.entrySet().stream().map(f -> mapper.toItemBookingDto(f.getKey(),
-                null,
-                null,
-                f.getKey().getId(),
-                f.getValue().stream().map(CommentShortResponseDto::new).collect(Collectors.toList())));*/
-        return items.stream()
-                .map(f -> getById(f.getId(), userId))
-                .collect(toList());
-    }
- /* Следует получить комментарии всех вещей, которые будут возвращены вне цикла и разбить их на мапу,
-    где ключ - идентификатор вещи, а значение - коллекция из комментариев) Таким образом мы не будем производить n-лишних запросов к БД)
-    Получение следует произвести вне цикла)
-    Аналогично следует поступить и с поиском предыдущего и следующего бронирования)
-    Где можно было бы по коллекции предметов произвести получение и сразу же выполнить сортировку, чтобы поиск небходимых бронирований был проще)
 
-    Map<Item, List<Comment>> comments = commentRepository.findByItemIn(items, Sort.by(DESC, "created"))
-            .stream()
-            .collect(groupingBy(Comment::getItem, toList()));*/
+        Map<Item, List<Booking>> bookings = bookingRepository.findByItemIn(items, Sort.by(ASC, "end"))
+                .stream()
+                .collect(groupingBy(Booking::getItem, toList()));
+        List<CommentResponseDto> commentsShort;
+        List<ItemBookingDto> itemBookingDto = new ArrayList<>();
+
+        for (Item item: items) {
+            int bookigsSize = 0;
+            if (bookings.containsKey(item)) {
+                bookigsSize = bookings.get(item).size();
+            }
+            commentsShort = mapper.mapComment(comments.get(item));
+
+            itemBookingDto.add(mapper.toItemBookingCommentDto(item,
+                    bookigsSize < 2 ? null : mapper.toLastNextItemDto(bookings.get(item).get(0)),
+                    bookigsSize < 2 ? null : mapper.toLastNextItemDto(bookings.get(item).get(bookigsSize - 1))
+                    ,item.getId(),
+                    commentsShort));
+        }
+        return itemBookingDto;
+    }
 
     @Override
     public ItemBookingDto getById(Long itemId, Long userId) {
