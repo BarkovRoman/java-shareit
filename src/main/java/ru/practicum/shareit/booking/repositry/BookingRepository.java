@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.item.dto.LastNextItemShortDto;
 import ru.practicum.shareit.item.model.Item;
 
@@ -35,5 +36,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("select b from Booking b  left join Item i on b.item.id = i.id where i.owner = ?1 and b.status = ?2 and b.end < ?3 order by b.end desc ")
     List<Booking> findByOwnerIdAndStatusIsBefore(Long userId, BookingStatus approved, LocalDateTime localDateTime);
 
-    List<Booking> findByItemIn(List<Item> items, Sort end);
+    List<Booking> findByItemInAndStatus(List<Item> items, BookingStatus status, Sort end);
 }

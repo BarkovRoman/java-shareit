@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.*;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repositry.BookingRepository;
 import ru.practicum.shareit.exception.ExistingValidationException;
 import ru.practicum.shareit.exception.IllegalRequestException;
@@ -54,8 +55,7 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalRequestException(String.format("Booking id=%s уже имеет статус подтверждения", bookingId));
         }
         if (approved) booking.setStatus(BookingStatus.APPROVED);
-        if (!approved) booking.setStatus(BookingStatus.REJECTED);
-        bookingRepository.save(booking);
+        else booking.setStatus(BookingStatus.REJECTED);
         log.debug("Обновление Booking {}", booking);
         return mapper.bookingToBookingResponseDto(booking);
     }
@@ -72,7 +72,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> getByBookerIdAndState(Long userId, String state) {
+    public List<BookingResponseDto> getByBookerIdAndState(Long userId, Status state) {
         isExistsUserById(userId);
         BookingStatus status = isExistsStatus(state);
 
@@ -95,9 +95,8 @@ public class BookingServiceImpl implements BookingService {
                 .collect(Collectors.toList());
     }
 
-
     @Override
-    public List<BookingResponseDto> getAllOwnerId(Long userId, String state) {
+    public List<BookingResponseDto> getAllOwnerId(Long userId, Status state) {
         isExistsUserById(userId);
         BookingStatus status = isExistsStatus(state);
         if (status.equals(BookingStatus.PAST)) {
@@ -132,19 +131,19 @@ public class BookingServiceImpl implements BookingService {
         return item;
     }
 
-    private BookingStatus isExistsStatus(String status) {
+    private BookingStatus isExistsStatus(Status status) {
         switch (status) {
-            case ("REJECTED") :
-            case ("CURRENT") :
+            case REJECTED :
+            case CURRENT :
                 return BookingStatus.REJECTED;
-            case ("APPROVED") :
+            case APPROVED :
                 return BookingStatus.APPROVED;
-            case ("PAST") :
+            case PAST :
                 return BookingStatus.PAST;
-            case ("WAITING") :
+            case WAITING :
                 return BookingStatus.WAITING;
-            case ("ALL") :
-            case ("FUTURE") :
+            case ALL :
+            case FUTURE :
                 return BookingStatus.ALL;
             default: throw new IllegalRequestException("Unknown state: UNSUPPORTED_STATUS");
         }

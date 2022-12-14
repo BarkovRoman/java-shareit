@@ -79,7 +79,7 @@ public class ItemServiceImpl implements ItemService {
                 .stream()
                 .collect(groupingBy(Comment::getItem, toList()));
 
-        Map<Item, List<Booking>> bookings = bookingRepository.findByItemIn(items, Sort.by(ASC, "end"))
+        Map<Item, List<Booking>> bookings = bookingRepository.findByItemInAndStatus(items, BookingStatus.APPROVED, Sort.by(ASC, "end"))
                 .stream()
                 .collect(groupingBy(Booking::getItem, toList()));
         List<CommentResponseDto> commentsShort;
@@ -93,8 +93,8 @@ public class ItemServiceImpl implements ItemService {
             commentsShort = mapper.mapComment(comments.get(item));
 
             itemBookingDto.add(mapper.toItemBookingCommentDto(item,
-                    bookigsSize < 2 ? null : mapper.toLastNextItemDto(bookings.get(item).get(0)),
-                    bookigsSize < 2 ? null : mapper.toLastNextItemDto(bookings.get(item).get(bookigsSize - 1)),
+                    bookigsSize == 0 ? null : mapper.toLastNextItemDto(bookings.get(item).get(bookigsSize - 1)),
+                    bookigsSize == 0 ? null : mapper.toLastNextItemDto(bookings.get(item).get(bookigsSize - 1)),
                     item.getId(),
                     commentsShort));
         }
