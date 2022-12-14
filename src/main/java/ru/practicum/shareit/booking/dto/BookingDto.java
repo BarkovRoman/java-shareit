@@ -1,9 +1,9 @@
 package ru.practicum.shareit.booking.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.sun.istack.NotNull;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.exception.validation.StartBeforeEndDateValid;
 
@@ -13,7 +13,8 @@ import java.time.LocalDateTime;
 
 @Value
 @StartBeforeEndDateValid
-@AllArgsConstructor(onConstructor = @__(@JsonCreator))
+@Builder
+@Jacksonized
 public class BookingDto {
     Long id;
     @NotNull

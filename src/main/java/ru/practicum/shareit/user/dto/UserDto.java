@@ -1,14 +1,15 @@
 package ru.practicum.shareit.user.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 @Value
-@AllArgsConstructor(onConstructor = @__(@JsonCreator))
+@Builder
+@Jacksonized
 public class UserDto {
     Long id;
 
