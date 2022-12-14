@@ -42,6 +42,7 @@ public interface ItemMapper {
         commentResponseDto.setAuthorName(comment.getAuthor().getName());
         return commentResponseDto;
     }
+
     @Mapping(target = "id", source = "booking.id")
     @Mapping(target = "bookerId", source = "booking.booker.id")
     LastNextItemResponseDto toLastNextItemDto(Booking booking);

@@ -94,8 +94,8 @@ public class ItemServiceImpl implements ItemService {
 
             itemBookingDto.add(mapper.toItemBookingCommentDto(item,
                     bookigsSize < 2 ? null : mapper.toLastNextItemDto(bookings.get(item).get(0)),
-                    bookigsSize < 2 ? null : mapper.toLastNextItemDto(bookings.get(item).get(bookigsSize - 1))
-                    ,item.getId(),
+                    bookigsSize < 2 ? null : mapper.toLastNextItemDto(bookings.get(item).get(bookigsSize - 1)),
+                    item.getId(),
                     commentsShort));
         }
         return itemBookingDto;
