@@ -99,7 +99,10 @@ public class ItemServiceImpl implements ItemService {
                                     date.getStart().equals(LocalDateTime.now()))
                             .min((o1, o2) -> o2.getEnd().compareTo(o1.getEnd()))
                             .orElse(null)),
-                    bookigsSize == 0 ? null : mapper.toLastNextItemDto(bookings.get(item).get(bookigsSize - 1)),
+                    bookigsSize == 0 ? null : mapper.toLastNextItemDto(bookings.get(item).stream()
+                            .filter(date -> date.getStart().isAfter(LocalDateTime.now()))
+                            .max((o1, o2) -> o2.getStart().compareTo(o1.getStart()))
+                            .orElse(null)),
                     item.getId(),
                     commentsShort));
         }
@@ -114,14 +117,16 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не найден", itemId)));
         ItemBookingDto itemBookingDto;
         itemBookingDto = mapper.toItemBookingCommentDto(item,
-                bookings.size() == 0 ? null : mapper.toLastNextItemDto(bookings
-                        .stream()
+                bookings.size() == 0 ? null : mapper.toLastNextItemDto(bookings.stream()
                         .filter(date -> date.getStart().isBefore(LocalDateTime.now()) ||
                                 date.getEnd().isBefore(LocalDateTime.now()) ||
                                 date.getStart().equals(LocalDateTime.now()))
                         .min((o1, o2) -> o2.getEnd().compareTo(o1.getEnd()))
                         .orElse(null)),
-                bookings.size() == 0 ? null : mapper.toLastNextItemDto(bookings.get(bookings.size() - 1)),
+                bookings.size() == 0 ? null : mapper.toLastNextItemDto(bookings.stream()
+                        .filter(date -> date.getStart().isAfter(LocalDateTime.now()))
+                        .max((o1, o2) -> o2.getStart().compareTo(o1.getStart()))
+                        .orElse(null)),
                 item.getId(),
                 comments);
         return itemBookingDto;
