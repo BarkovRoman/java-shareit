@@ -65,7 +65,6 @@ public class ItemServiceImpl implements ItemService {
         if (item.getAvailable() != null) {
             itemUpdate.setAvailable(item.getAvailable());
         }
-        itemRepository.save(itemUpdate);
         itemDto = mapper.toItemDto(itemUpdate);
         log.debug("Обновление item {}", item);
         return itemDto;
@@ -85,7 +84,7 @@ public class ItemServiceImpl implements ItemService {
         List<CommentResponseDto> commentsShort;
         List<ItemBookingDto> itemBookingDto = new ArrayList<>();
 
-        for (Item item: items) {
+        for (Item item : items) {
             int bookigsSize = 0;
             if (bookings.containsKey(item)) {
                 bookigsSize = bookings.get(item).size();
@@ -93,8 +92,15 @@ public class ItemServiceImpl implements ItemService {
             commentsShort = mapper.mapComment(comments.get(item));
 
             itemBookingDto.add(mapper.toItemBookingCommentDto(item,
-                    bookigsSize == 0 ? null : mapper.toLastNextItemDto(bookings.get(item).get(bookigsSize - 1)),
-                    bookigsSize == 0 ? null : mapper.toLastNextItemDto(bookings.get(item).get(bookigsSize - 1)),
+                    bookigsSize == 0 ? null : mapper.toLastNextItemDto(bookings.get(item)
+                            .stream()
+                            .filter(date -> date.getStart().isBefore(LocalDateTime.now()) || date.getEnd().isBefore(LocalDateTime.now()))
+                            .min((o1, o2) -> o2.getEnd().compareTo(o1.getEnd()))
+                            .orElse(null)),
+                    bookigsSize == 0 ? null : mapper.toLastNextItemDto(bookings.get(item).stream()
+                            .filter(date -> date.getStart().isAfter(LocalDateTime.now()))
+                            .min((o1, o2) -> o2.getStart().compareTo(o1.getStart()))
+                            .orElse(null)),
                     item.getId(),
                     commentsShort));
         }
@@ -103,16 +109,25 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemBookingDto getById(Long itemId, Long userId) {
-        LinkedList<LastNextItemShortDto> bookings = bookingRepository.getBookingByItem(itemId, userId);
-        List<CommentShortResponseDto> comments = commentRepository.findCommentByItem_Id(itemId);
-        if (bookings.size() == 0) {
-            return mapper.toItemBookingDto(itemRepository.findById(itemId)
-                            .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не найден", itemId))),
-                    null, null, itemId, comments);
-        }
-        return mapper.toItemBookingDto(itemRepository.findById(itemId)
-                        .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не найден", itemId))),
-                bookings.getFirst(), bookings.getLast(), itemId, comments);
+        List<Booking> bookings = bookingRepository.getBookingByItem(itemId, userId, BookingStatus.APPROVED);
+        List<CommentResponseDto> comments = mapper.mapComment(commentRepository.findCommentByItem_Id(itemId));
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не найден", itemId)));
+        ItemBookingDto itemBookingDto;
+        itemBookingDto = mapper.toItemBookingCommentDto(item,
+                bookings.size() == 0 ? null : mapper.toLastNextItemDto(bookings
+                        .stream()
+                        .filter(date -> date.getStart().isBefore(LocalDateTime.now()) || date.getEnd().isBefore(LocalDateTime.now()))
+                        .min((o1, o2) -> o2.getEnd().compareTo(o1.getEnd()))
+                        .orElse(null)),
+                bookings.size() == 0 ? null : mapper.toLastNextItemDto(bookings
+                        .stream()
+                        .filter(date -> date.getStart().isAfter(LocalDateTime.now()))
+                        .min((o1, o2) -> o2.getStart().compareTo(o1.getStart()))
+                        .orElse(null)),
+                item.getId(),
+                comments);
+        return itemBookingDto;
     }
 
     @Override

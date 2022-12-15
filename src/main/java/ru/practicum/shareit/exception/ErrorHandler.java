@@ -27,12 +27,6 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleThrowable(final Throwable e) {
-        log.warn("Ошибка сервера 500 {}", e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
         Map<String, String> result = exception.getFieldErrors().stream()
@@ -43,6 +37,13 @@ public class ErrorHandler {
                         fieldError -> Objects.requireNonNullElse(fieldError.getDefaultMessage(), "")));
         log.warn(String.valueOf(result), exception);
         return result;
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleThrowable(final Throwable e) {
+        log.warn("Ошибка сервера 500 {}", e.getMessage());
+        return new ErrorResponse("Unknown state: UNSUPPORTED_STATUS");
     }
 
     @ExceptionHandler
