@@ -94,13 +94,12 @@ public class ItemServiceImpl implements ItemService {
             itemBookingDto.add(mapper.toItemBookingCommentDto(item,
                     bookigsSize == 0 ? null : mapper.toLastNextItemDto(bookings.get(item)
                             .stream()
-                            .filter(date -> date.getStart().isBefore(LocalDateTime.now()) || date.getEnd().isBefore(LocalDateTime.now()))
+                            .filter(date -> date.getStart().isBefore(LocalDateTime.now()) ||
+                                    date.getEnd().isBefore(LocalDateTime.now()) ||
+                                    date.getStart().equals(LocalDateTime.now()))
                             .min((o1, o2) -> o2.getEnd().compareTo(o1.getEnd()))
                             .orElse(null)),
-                    bookigsSize == 0 ? null : mapper.toLastNextItemDto(bookings.get(item).stream()
-                            .filter(date -> date.getStart().isAfter(LocalDateTime.now()))
-                            .min((o1, o2) -> o2.getStart().compareTo(o1.getStart()))
-                            .orElse(null)),
+                    bookigsSize == 0 ? null : mapper.toLastNextItemDto(bookings.get(item).get(bookigsSize - 1)),
                     item.getId(),
                     commentsShort));
         }
@@ -117,14 +116,12 @@ public class ItemServiceImpl implements ItemService {
         itemBookingDto = mapper.toItemBookingCommentDto(item,
                 bookings.size() == 0 ? null : mapper.toLastNextItemDto(bookings
                         .stream()
-                        .filter(date -> date.getStart().isBefore(LocalDateTime.now()) || date.getEnd().isBefore(LocalDateTime.now()))
+                        .filter(date -> date.getStart().isBefore(LocalDateTime.now()) ||
+                                date.getEnd().isBefore(LocalDateTime.now()) ||
+                                date.getStart().equals(LocalDateTime.now()))
                         .min((o1, o2) -> o2.getEnd().compareTo(o1.getEnd()))
                         .orElse(null)),
-                bookings.size() == 0 ? null : mapper.toLastNextItemDto(bookings
-                        .stream()
-                        .filter(date -> date.getStart().isAfter(LocalDateTime.now()))
-                        .min((o1, o2) -> o2.getStart().compareTo(o1.getStart()))
-                        .orElse(null)),
+                bookings.size() == 0 ? null : mapper.toLastNextItemDto(bookings.get(bookings.size() - 1)),
                 item.getId(),
                 comments);
         return itemBookingDto;
