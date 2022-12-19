@@ -18,12 +18,6 @@ public interface ItemMapper {
 
     ItemDto toItemDto(Item item);
 
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "lastBooking", source = "lastBooking")
-    @Mapping(target = "nextBooking", source = "nextBooking")
-    @Mapping(target = "comments", source = "comments")
-    ItemBookingDto toItemBookingDto(Item item, LastNextItemShortDto lastBooking, LastNextItemShortDto nextBooking, Long id, List<CommentShortResponseDto> comments);
-
     @Mapping(target = "author", source = "user")
     @Mapping(target = "item", source = "item")
     @Mapping(target = "id", ignore = true)
@@ -51,5 +45,9 @@ public interface ItemMapper {
     @Mapping(target = "lastBooking", source = "lastBooking")
     @Mapping(target = "nextBooking", source = "nextBooking")
     @Mapping(target = "comments", source = "comments")
-    ItemBookingDto toItemBookingCommentDto(Item item, LastNextItemResponseDto lastBooking, LastNextItemResponseDto nextBooking, Long id, List<CommentResponseDto> comments);
+    ItemBookingDto toItemBookingCommentDto(Item item,
+                                           LastNextItemResponseDto lastBooking,
+                                           LastNextItemResponseDto nextBooking,
+                                           Long id,
+                                           List<CommentResponseDto> comments);
 }

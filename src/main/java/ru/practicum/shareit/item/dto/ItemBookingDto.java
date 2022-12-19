@@ -14,7 +14,6 @@ public class ItemBookingDto {
     Boolean available;
     LastNextItemResponseDto lastBooking;
     LastNextItemResponseDto nextBooking;
-
     List<CommentResponseDto> comments;
 
 

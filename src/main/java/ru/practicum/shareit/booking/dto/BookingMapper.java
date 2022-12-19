@@ -17,8 +17,4 @@ public interface BookingMapper {
     Booking toBooking(BookingDto bookingDto, Item item, User booker);
 
     BookingResponseDto bookingToBookingResponseDto(Booking booking);
-
-    ItemResponseDto itemResponseDto(Item item);
-
-    BookerResponseDto bookerResponseDto(User booker);
 }
