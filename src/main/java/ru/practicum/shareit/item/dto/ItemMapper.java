@@ -37,6 +37,8 @@ public interface ItemMapper {
         return commentResponseDto;
     }
 
+    List<ItemOwnerResponseDto> mapItemOwner(List<Item> items);
+
     @Mapping(target = "id", source = "booking.id")
     @Mapping(target = "bookerId", source = "booking.booker.id")
     LastNextItemResponseDto toLastNextItemDto(Booking booking);

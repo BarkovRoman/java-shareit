@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
@@ -43,7 +44,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleThrowable(final Throwable e) {
         log.warn("Ошибка сервера 500 {}", e.getMessage());
-        return new ErrorResponse("Unknown state: UNSUPPORTED_STATUS");
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
@@ -63,9 +64,10 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleIllegalRequestException(IllegalRequestException e) {   // 400 BAD_REQUEST
-        log.warn("Ошибка 400 {}", e.getError());
-        return new ErrorResponse(e.getError());
+    public ErrorResponse handleMethodArgumentTypeMismatchExceptio(final MethodArgumentTypeMismatchException e) {   // 400 BAD_REQUEST
+        final String error = "Unknown " + e.getName() + ": " + e.getValue();
+        log.warn("Ошибка 400 {}", error);
+        return new ErrorResponse(error);
     }
 
     @ExceptionHandler
@@ -80,5 +82,12 @@ public class ErrorHandler {
         Map<String, String> result = Map.of("Ошибка ", exception.getMessage());
         log.warn(String.valueOf(result), exception);
         return result;
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleIllegalRequestException(IllegalRequestException e) {   // 400 BAD_REQUEST
+        log.warn("Ошибка 400 {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
     }
 }
