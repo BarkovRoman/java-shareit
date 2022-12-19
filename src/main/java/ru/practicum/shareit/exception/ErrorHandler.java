@@ -27,18 +27,6 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleThrowable(final Throwable e) {
-        log.warn("Ошибка сервера 500 {}", e.getMessage());
-        return new ResponseEntity<>("Произошла непредвиденная ошибка сервера", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<String> handleExistingEmailException(final ExistingEmailException e) {
-        log.warn("Ошибка 500 {}", e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
         Map<String, String> result = exception.getFieldErrors().stream()
@@ -52,17 +40,16 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> exc(ConstraintViolationException e) {
-        log.warn("Ошибка валидации 400 {}", e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleThrowable(final Throwable e) {
+        log.warn("Ошибка сервера 500 {}", e.getMessage());
+        return new ErrorResponse("Unknown state: UNSUPPORTED_STATUS");
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handleNotFoundException(NotFoundException exception) {
-        Map<String, String> result = Map.of("Ошибка не найденно", exception.getMessage());
-        log.warn(String.valueOf(result), exception);
-        return result;
+    public ResponseEntity<String> exc(ConstraintViolationException e) {
+        log.warn("Ошибка валидации 400 {}", e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
@@ -70,6 +57,27 @@ public class ErrorHandler {
     public Map<String, String> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception) {
         String message = exception.getMessage();
         Map<String, String> result = Map.of("Ошибка Request", Objects.isNull(message) ? "Неизвестно" : message);
+        log.warn(String.valueOf(result), exception);
+        return result;
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleIllegalRequestException(IllegalRequestException e) {   // 400 BAD_REQUEST
+        log.warn("Ошибка 400 {}", e.getError());
+        return new ErrorResponse(e.getError());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleExistingValidationException(final ExistingValidationException e) {
+        log.warn("Ошибка 400 {}", e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleNotFoundException(NotFoundException exception) {      // 404 NOT_FOUND
+        Map<String, String> result = Map.of("Ошибка ", exception.getMessage());
         log.warn(String.valueOf(result), exception);
         return result;
     }

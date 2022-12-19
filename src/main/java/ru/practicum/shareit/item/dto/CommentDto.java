@@ -5,17 +5,12 @@ import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Value
 @Builder
 @Jacksonized
-public class ItemDto {
+public class CommentDto {
     Long id;
-    @NotBlank
-    String name;
-    @NotBlank
-    String description;
-    @NotNull
-    Boolean available; // статус доступности
+    @NotBlank(message = "Комментарий не может быть пустым")
+    String text;
 }

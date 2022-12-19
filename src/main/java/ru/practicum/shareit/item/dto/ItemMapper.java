@@ -1,31 +1,53 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.user.model.User;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ItemMapper {
-    public static ItemDto toItemDto(Item item) {
-        return new ItemDto(
-                item.getId(),
-                item.getName(),
-                item.getDescription(),
-                item.getAvailable(),
-                item.getRequest() != null ? item.getRequest().getId() : 0,
-                item.getUserId()
-        );
+import java.util.List;
+
+@Mapper(componentModel = "spring")
+public interface ItemMapper {
+
+    @Mapping(target = "id", source = "itemId")
+    @Mapping(target = "owner", source = "userId")
+    Item toItem(ItemDto itemDto, Long userId, Long itemId);
+
+    ItemDto toItemDto(Item item);
+
+    @Mapping(target = "author", source = "user")
+    @Mapping(target = "item", source = "item")
+    @Mapping(target = "id", ignore = true)
+    Comment toComment(CommentDto commentDto, Item item, User user);
+
+    @Mapping(target = "authorName", source = "author")
+    CommentResponseDto toCommentResponseDto(Comment comment, String author);
+
+    List<CommentResponseDto> mapComment(List<Comment> commentLit);
+
+    default CommentResponseDto mapComment(Comment comment) {
+        CommentResponseDto commentResponseDto = new CommentResponseDto();
+        commentResponseDto.setId(comment.getId());
+        commentResponseDto.setText(comment.getText());
+        commentResponseDto.setCreated(comment.getCreated());
+        commentResponseDto.setAuthorName(comment.getAuthor().getName());
+        return commentResponseDto;
     }
 
-    public static Item toItem(ItemDto itemDto, long userId, long itemId) {
-        return new Item(
-                itemId,
-                itemDto.getName(),
-                itemDto.getDescription(),
-                itemDto.getAvailable(),
-                itemDto.getRequest() != 0 ? new ItemRequest() : null,
-                userId
-        );
-    }
+    @Mapping(target = "id", source = "booking.id")
+    @Mapping(target = "bookerId", source = "booking.booker.id")
+    LastNextItemResponseDto toLastNextItemDto(Booking booking);
+
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "lastBooking", source = "lastBooking")
+    @Mapping(target = "nextBooking", source = "nextBooking")
+    @Mapping(target = "comments", source = "comments")
+    ItemBookingDto toItemBookingCommentDto(Item item,
+                                           LastNextItemResponseDto lastBooking,
+                                           LastNextItemResponseDto nextBooking,
+                                           Long id,
+                                           List<CommentResponseDto> comments);
 }
