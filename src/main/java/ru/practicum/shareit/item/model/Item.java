@@ -24,7 +24,6 @@ public class Item {
 
     @OneToOne
     @JoinColumn(name = "request_id")
-    //Long requestId;
     private ItemRequest request; // ссылка на запрос создания вещи другого пользователя
 
     @Column(name = "owner_id")

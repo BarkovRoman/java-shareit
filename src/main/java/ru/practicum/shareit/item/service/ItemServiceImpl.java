@@ -15,6 +15,7 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
@@ -33,13 +34,15 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
     private final ItemMapper mapper;
 
     @Override
     @Transactional
     public ItemDto add(ItemDto itemDto, Long userId) {
         isExistsUserById(userId);
-        Item item = itemRepository.save(mapper.toItem(itemDto, userId, null));
+        Item item = itemRepository.save(mapper.toItem(itemDto, userId,
+                itemDto.getRequestId() == null ? null : itemRequestRepository.findById(itemDto.getRequestId()).orElse(null)));
         itemDto = mapper.toItemDto(item);
         log.debug("Добавлен item {}", item);
         return itemDto;
@@ -50,7 +53,8 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto update(Long userId, Long itemId, ItemDto itemDto) {
         isExistsUserById(userId);
         isExistsItemById(itemId);
-        Item item = mapper.toItem(itemDto, userId, itemId);
+        Item item = mapper.toItem(itemDto, userId,
+                itemDto.getRequestId() == null ? null : itemRequestRepository.findById(itemDto.getRequestId()).orElse(null));
         Item itemUpdate = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Item id=%s не найден", itemId)));
         if (!itemUpdate.getOwner().equals(userId)) {

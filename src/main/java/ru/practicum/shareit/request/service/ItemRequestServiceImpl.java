@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
@@ -46,6 +47,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         User requestor = isExistsUserById(userId);
         ItemRequest itemRequest = mapper.toItemRequest(itemRequestDto, requestor);
         ItemRequest itemRequest1 = itemRequestRepository.save(itemRequest);
+        log.info("Добавлен ItemRequest {}", itemRequest);
         return mapper.toItemRequestCreateDto(itemRequest1, requestor);
     }
 
@@ -65,7 +67,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             if(items.containsKey(request)) {
                 itemSize = items.get(request).size();
             }
-            itemOwner = itemMapper.mapItemOwner(items.get(request));
+            itemOwner = itemSize == 0 ? emptyList() : itemMapper.mapItemOwner(items.get(request));
 
             itemRequestResponseDtos.add(mapper.toItemRequestResponseDto(request, itemOwner));
         }

@@ -8,5 +8,7 @@ import lombok.Value;
 public class ItemOwnerResponseDto {
     Long id;
     String name;
-    Long owner;
+    String description;
+    Boolean available;
+    Long requestId;
 }

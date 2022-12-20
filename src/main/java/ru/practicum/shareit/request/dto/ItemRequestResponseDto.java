@@ -14,7 +14,7 @@ import java.util.List;
 public class ItemRequestResponseDto {
     private long id;
     private String description;
-    private User requestor;
+    private User requestor;   // убрать
     private LocalDateTime created;
     private List<ItemOwnerResponseDto> items;
 }
