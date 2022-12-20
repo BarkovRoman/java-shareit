@@ -21,5 +21,5 @@ public class ItemRequest {
     @ManyToOne
     @JoinColumn(name = "requestor_id")
     private User requestor;    // пользователь, создавший запрос
-    LocalDateTime created = LocalDateTime.now();    // дата и время создания запроса.
+    private LocalDateTime created = LocalDateTime.now();    // дата и время создания запроса.
 }

@@ -40,7 +40,15 @@ public interface ItemMapper {
         return commentResponseDto;
     }
 
-    List<ItemOwnerResponseDto> mapItemOwner(List<Item> items);
+    List<ItemRequestIdResponseDto> mapItemOwner(List<Item> items);
+
+    default ItemRequestIdResponseDto mapItemOwner(Item items) {
+        return new ItemRequestIdResponseDto(items.getId(),
+                items.getName(),
+                items.getDescription(),
+                items.getAvailable(),
+                items.getRequest().getId());
+    }
 
     @Mapping(target = "id", source = "booking.id")
     @Mapping(target = "bookerId", source = "booking.booker.id")

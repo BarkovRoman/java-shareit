@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestCreateDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
 import javax.validation.Valid;
@@ -30,13 +31,13 @@ public class ItemRequestController {
     @GetMapping("/{requestId}")
     public ItemRequestResponseDto getById(@RequestHeader("X-Sharer-User-Id") Long userId,
                                           @PathVariable Long requestId) {
-        return itemRequestService.getById(requestId);
+        return itemRequestService.getById(requestId, userId);
     }
 
     @GetMapping("/all")
     public List<ItemRequestResponseDto> getAll(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                               @RequestParam(defaultValue = "0") int from,
-                                               @RequestParam(defaultValue = "0") int size) {
-        return itemRequestService.getAll(from, size);
+                                    @RequestParam(defaultValue = "0") Integer from,
+                                    @RequestParam(defaultValue = "1") Integer size) {
+        return itemRequestService.getAll(from, size, userId);
     }
 }

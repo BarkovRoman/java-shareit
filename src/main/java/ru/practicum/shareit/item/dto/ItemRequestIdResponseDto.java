@@ -5,7 +5,7 @@ import lombok.Value;
 
 @Value
 @AllArgsConstructor
-public class ItemOwnerResponseDto {
+public class ItemRequestIdResponseDto {
     Long id;
     String name;
     String description;
