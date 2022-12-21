@@ -52,7 +52,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException(String.format("Booking id=%s не найден", bookingId)));
         if (!booking.getItem().getOwner().equals(userId)) {
-            throw new NotFoundException(String.format("Item id=%s не пренадлежит User id=%s", bookingId, userId));
+            throw new NotFoundException(String.format("Item id=%s не принадлежит User id=%s", bookingId, userId));
         }
         if (booking.getStatus() == BookingStatus.APPROVED) {
             throw new IllegalRequestException(String.format("Booking id=%s уже имеет статус подтверждения", bookingId));
@@ -71,7 +71,7 @@ public class BookingServiceImpl implements BookingService {
             return mapper.bookingToBookingResponseDto(booking);
         }
         throw new NotFoundException(String.format(
-                "Booking id=%s не пренадлежит User id=%s", bookingId, userId));
+                "Booking id=%s не принадлежит User id=%s", bookingId, userId));
     }
 
     @Override
@@ -110,7 +110,7 @@ public class BookingServiceImpl implements BookingService {
                     .map(mapper::bookingToBookingResponseDto)
                     .collect(Collectors.toList());
         }
-        Pageable page1 = PageRequest.of(from, 1, sort);
+        Pageable page1 = PageRequest.of(from/size, size, sort);
         do {
             bookings = bookingRepository.findByBookerId(userId, page1);
             if (bookings.hasNext()) {

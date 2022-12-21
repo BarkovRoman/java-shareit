@@ -61,7 +61,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         List<ItemRequestResponseDto> itemRequests = new ArrayList<>();
 
         for (ItemRequest request : requests) {
-            int itemSize = 0;
+            long itemSize = 0;
             if (items.containsKey(request)) {
                 itemSize = items.get(request).size();
             }
