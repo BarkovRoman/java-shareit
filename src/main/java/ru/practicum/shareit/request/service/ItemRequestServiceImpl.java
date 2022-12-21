@@ -28,6 +28,7 @@ import java.util.Map;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Slf4j
 @Service
@@ -52,12 +53,12 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public List<ItemRequestResponseDto> getByUser(Long userId) {
         isExistsUserById(userId);
-        List<ItemRequest> requests = itemRequestRepository.findByRequestorId(userId);
+        List<ItemRequest> requests = itemRequestRepository.findByRequestorId(userId, Sort.by(DESC, "created"));
         Map<ItemRequest, List<Item>> items = itemRepository.findByRequestIn(requests)
                 .stream()
                 .collect(groupingBy(Item::getRequest, toList()));
         List<ItemRequestIdResponseDto> itemRequestId;
-        List<ItemRequestResponseDto> itemRequestResponseDtos = new ArrayList<>();
+        List<ItemRequestResponseDto> itemRequests = new ArrayList<>();
 
         for (ItemRequest request : requests) {
             int itemSize = 0;
@@ -65,9 +66,9 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 itemSize = items.get(request).size();
             }
             itemRequestId = itemSize == 0 ? new ArrayList<>() : itemMapper.mapItemOwner(items.get(request));
-            itemRequestResponseDtos.add(mapper.toItemRequestResponseDto(request, itemRequestId));
+            itemRequests.add(mapper.toItemRequestResponseDto(request, itemRequestId));
         }
-        return itemRequestResponseDtos;
+        return itemRequests;
     }
 
     @Override
@@ -76,29 +77,29 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         ItemRequest itemRequest = itemRequestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException(String.format("ItemRequest id=%s не найден", requestId)));
         List<Item> items = itemRepository.findByRequest(itemRequest);
-        List<ItemRequestIdResponseDto> itemOwner = itemMapper.mapItemOwner(items);
-        return mapper.toItemRequestResponseDto(itemRequest, itemOwner);
+        List<ItemRequestIdResponseDto> itemRequests = itemMapper.mapItemOwner(items);
+        return mapper.toItemRequestResponseDto(itemRequest, itemRequests);
     }
 
     @Override
     public List<ItemRequestResponseDto> getAll(Integer from, Integer size, Long userId) {
-        Sort sortById = Sort.by(Sort.Direction.ASC, "id");
+        Sort sortById = Sort.by(Sort.Direction.DESC, "created");
         Pageable page = PageRequest.of(from, size, sortById);
-        List<ItemRequestResponseDto> itemRequest = new ArrayList<>();
+        List<ItemRequestResponseDto> itemRequestId = new ArrayList<>();
         do {
             Page<ItemRequest> requestPage = itemRequestRepository.findByRequestorIdNot(page, userId);
             Map<ItemRequest, List<Item>> items = itemRepository.findByRequestIn(requestPage.getContent())
                     .stream()
                     .collect(groupingBy(Item::getRequest, toList()));
             requestPage.getContent().forEach(request -> {
-                List<ItemRequestIdResponseDto> itemOwner;
+                List<ItemRequestIdResponseDto> itemRequests;
                 int itemSize = 0;
                 if (items.containsKey(request)) {
                     itemSize = items.get(request).size();
                 }
-                itemOwner = itemSize == 0 ? new ArrayList<>() : itemMapper.mapItemOwner(items.get(request));
+                itemRequests = itemSize == 0 ? new ArrayList<>() : itemMapper.mapItemOwner(items.get(request));
 
-                itemRequest.add(mapper.toItemRequestResponseDto(request, itemOwner));
+                itemRequestId.add(mapper.toItemRequestResponseDto(request, itemRequests));
             });
             if (requestPage.hasNext()) {
                 page = PageRequest.of(requestPage.getNumber() + 1, requestPage.getSize(), requestPage.getSort());
@@ -106,7 +107,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 page = null;
             }
         } while (page != null);
-        return itemRequest;
+        return itemRequestId;
     }
 
     private User isExistsUserById(Long id) {
@@ -114,46 +115,3 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 .orElseThrow(() -> new NotFoundException(String.format("User id=%s не найден", id)));
     }
 }
-
-    /*public List<ItemRequestResponseDto> getAll(Integer from, Integer size, Long userId) {
-        // сначала создаём описание сортировки по полю id
-        Sort sortById = Sort.by(Sort.Direction.ASC, "id");
-        // затем создаём описание первой "страницы" размером size элемента
-        Pageable page = PageRequest.of(from, size, sortById);
-        List<ItemRequestResponseDto> itemRequestResponseDtos = new ArrayList<>();
-
-        do {
-            // запрашиваем у базы данных страницу с данными
-            Page<ItemRequest> requestPage = itemRequestRepository.findByRequestorIdNot(page, userId);
-            // результат запроса получаем с помощью метода getContent()
-
-            Map<ItemRequest, List<Item>> items = itemRepository.findByRequestIn(requestPage.getContent())
-                    .stream()
-                    .collect(groupingBy(Item::getRequest, toList()));
-
-
-
-
-            requestPage.getContent().forEach(request -> {
-                List<ItemOwnerResponseDto> itemOwner;
-                int itemSize = 0;
-                if(items.containsKey(request)) {
-                    itemSize = items.get(request).size();
-                }
-                itemOwner = itemSize == 0 ? new ArrayList<>() : itemMapper.mapItemOwner(items.get(request));
-
-                itemRequestResponseDtos.add(mapper.toItemRequestResponseDto(request, itemOwner));
-
-                // проверяем пользователей
-            });
-
-            // для типа Page проверяем, существует ли следующая страница
-            if(requestPage.hasNext()){
-                // если следующая страница существует, создаём её описание, чтобы запросить на следующей итерации цикла
-                page = PageRequest.of(requestPage.getNumber() + 1, requestPage.getSize(), requestPage.getSort()); // или для простоты -- userPage.nextOrLastPageable()
-            } else {
-                page = null;
-            }
-        } while (page != null);
-        return itemRequestResponseDtos;
-    }*/

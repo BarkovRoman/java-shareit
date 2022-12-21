@@ -24,26 +24,30 @@ public class BookingController {
 
     @PatchMapping("/{bookingId}")
     public BookingResponseDto update(@RequestHeader("X-Sharer-User-Id") Long userId,
-                             @RequestParam Boolean approved,
-                             @PathVariable Long bookingId) {
+                                     @RequestParam Boolean approved,
+                                     @PathVariable Long bookingId) {
         return bookingService.update(userId, bookingId, approved);
     }
 
     @GetMapping("/{bookingId}")
     public BookingResponseDto getById(@RequestHeader("X-Sharer-User-Id") Long userId,
-                              @PathVariable Long bookingId) {
+                                      @PathVariable Long bookingId) {
         return bookingService.getById(userId, bookingId);
     }
 
     @GetMapping()
     public List<BookingResponseDto> getByBookerIdAndState(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                               @RequestParam(defaultValue = "ALL") Status state) {
-        return bookingService.getByBookerIdAndState(userId, state);
+                                                          @RequestParam(defaultValue = "ALL") Status state,
+                                                          @RequestParam(defaultValue = "0") Integer from,
+                                                          @RequestParam(defaultValue = "5") Integer size) {
+        return bookingService.getByBookerIdAndState(userId, state, from, size);
     }
 
     @GetMapping("/owner")
     public List<BookingResponseDto> getAllOwnerId(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                        @RequestParam(defaultValue = "ALL") Status state) {
-        return bookingService.getAllOwnerId(userId, state);
+                                                  @RequestParam(defaultValue = "ALL") Status state,
+                                                  @RequestParam(defaultValue = "0") Integer from,
+                                                  @RequestParam(defaultValue = "5") Integer size) {
+        return bookingService.getAllOwnerId(userId, state, from, size);
     }
 }

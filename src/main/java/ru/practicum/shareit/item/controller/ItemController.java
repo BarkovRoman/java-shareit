@@ -32,8 +32,10 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemBookingDto> getByUser(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        return itemService.getByUser(userId);
+    public List<ItemBookingDto> getByUser(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                          @RequestParam(defaultValue = "0") Integer from,
+                                          @RequestParam(defaultValue = "5") Integer size) {
+        return itemService.getByUser(userId, from, size);
     }
 
     @GetMapping("/{itemId}")
@@ -43,8 +45,10 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItem(@RequestParam String text) {
-        return text.isBlank() ? Collections.emptyList() : itemService.search(text);
+    public List<ItemDto> searchItem(@RequestParam String text,
+                                    @RequestParam(defaultValue = "0") Integer from,
+                                    @RequestParam(defaultValue = "5") Integer size) {
+        return text.isBlank() ? Collections.emptyList() : itemService.search(text, from, size);
     }
 
     @PostMapping("/{itemId}/comment")
