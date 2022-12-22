@@ -13,6 +13,7 @@ public interface ItemRequestMapper {
     @Mapping(target = "requestor", source = "requestor")
     @Mapping(target = "id", source = "itemRequestDto.id")
     ItemRequest toItemRequest(ItemRequestDto itemRequestDto, User requestor);
+
     @Mapping(target = "items", source = "items")
     ItemRequestResponseDto toItemRequestResponseDto(ItemRequest itemRequest, List<ItemRequestIdResponseDto> items);
 

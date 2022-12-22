@@ -26,41 +26,37 @@ public class UserServiceTest {
 
     @Test
     public void createUser() {
-        UserDto userDto = mapper.toUserDto(new User(4L, "Name", "User@mail.ru"));
+        UserDto userDto = mapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
 
-        userService.add(userDto);
-        UserDto userDtoTest = userService.getById(4L);
+        Long userId = userService.add(userDto).getId();
+        UserDto userDtoTest = userService.getById(userId);
 
         assertThat("User@mail.ru", equalTo(userDtoTest.getEmail()));
-        assertThat(4L, equalTo(userDtoTest.getId()));
+        assertThat(userId, equalTo(userDtoTest.getId()));
     }
 
     @Test
     public void updateUserName() {
-        UserDto userDto = mapper.toUserDto(new User(3L, "Name", "UserNew@mail.ru"));
-        UserDto userDtoUpdate = mapper.toUserDto(new User(3L, "Update", "UserNew@mail.ru"));
+        UserDto userDto = mapper.toUserDto(new User(0L, "Name", "UserNew@mail.ru"));
+        Long userId = userService.add(userDto).getId();
+        UserDto userDtoUpdate = mapper.toUserDto(new User(userId, "Update", "UserNew@mail.ru"));
 
-        userService.add(userDto);
-        userService.update(userDtoUpdate, 3L);
+        UserDto userDtoTest = userService.update(userDtoUpdate, userId);
 
-        UserDto userDtoTest = userService.getById(3L);
-
-        assertThat(3L, equalTo(userDtoTest.getId()));
+        assertThat(userId, equalTo(userDtoTest.getId()));
         assertThat("Update", equalTo(userDtoTest.getName()));
         assertThat("UserNew@mail.ru", equalTo(userDtoTest.getEmail()));
     }
 
     @Test
     public void updateUserEmail() {
-        UserDto userDto = mapper.toUserDto(new User(5L, "Name", "UserNew@mail.ru"));
-        UserDto userDtoUpdate = mapper.toUserDto(new User(5L, "Name", "UserUpdate@mail.ru"));
+        UserDto userDto = mapper.toUserDto(new User(0L, "Name", "UserNew@mail.ru"));
+        Long userId = userService.add(userDto).getId();
+        UserDto userDtoUpdate = mapper.toUserDto(new User(userId, "Name", "UserUpdate@mail.ru"));
 
-        userService.add(userDto);
-        userService.update(userDtoUpdate, 5L);
+        UserDto userDtoTest = userService.update(userDtoUpdate, userId);
 
-        UserDto userDtoTest = userService.getById(5L);
-
-        assertThat(5L, equalTo(userDtoTest.getId()));
+        assertThat(userId, equalTo(userDtoTest.getId()));
         assertThat("Name", equalTo(userDtoTest.getName()));
         assertThat("UserUpdate@mail.ru", equalTo(userDtoTest.getEmail()));
     }
@@ -69,20 +65,21 @@ public class UserServiceTest {
     public void getAllDeleteUser() {
         UserDto userDto = mapper.toUserDto(new User(1L, "Name", "UserNew@mail.ru"));
         UserDto userDto1 = mapper.toUserDto(new User(2L, "Name", "UserNew1@mail.ru"));
+
         List<UserDto> users = List.of(userDto, userDto1);
 
-        userService.add(userDto);
-        userService.add(userDto1);
+        Long userId = userService.add(userDto).getId();
+        Long userId1 = userService.add(userDto1).getId();
 
         List<UserDto> usersTest = userService.getAll();
 
         assertThat(users, equalTo(usersTest));
         assertThat(2, equalTo(usersTest.size()));
 
-        userService.delete(1L);
+        userService.delete(userId);
         usersTest = userService.getAll();
 
         assertThat(1, equalTo(usersTest.size()));
-        assertThat(2L, equalTo(usersTest.get(0).getId()));
+        assertThat(userId1, equalTo(usersTest.get(0).getId()));
     }
 }
