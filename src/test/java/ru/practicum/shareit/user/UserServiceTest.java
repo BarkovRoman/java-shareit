@@ -65,14 +65,10 @@ public class UserServiceTest {
     public void getAllDeleteUser() {
         UserDto userDto = mapper.toUserDto(new User(1L, "Name", "UserNew@mail.ru"));
         UserDto userDto1 = mapper.toUserDto(new User(2L, "Name", "UserNew1@mail.ru"));
-
-        List<UserDto> users = List.of(userDto, userDto1);
-
         Long userId = userService.add(userDto).getId();
         Long userId1 = userService.add(userDto1).getId();
-
         List<UserDto> usersTest = userService.getAll();
-        
+
         assertThat(2, equalTo(usersTest.size()));
 
         userService.delete(userId);
