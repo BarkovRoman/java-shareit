@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
@@ -19,6 +20,7 @@ import ru.practicum.shareit.user.service.UserService;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -93,6 +95,21 @@ public class ItemServiceTest {
     }
 
     @Test
+    public void updateItemNotUserId() {
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId = userService.add(userDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+
+        ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
+        Long itemId = itemService.add(itemDto, userId).getId();
+
+        assertThatThrownBy(() -> {
+            ItemDto itemDtoTest = itemService.update(userId1, itemId, itemDto);
+        }).isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
     public void getByUser() {
         UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
         Long userId = userService.add(userDto).getId();
@@ -108,14 +125,39 @@ public class ItemServiceTest {
     }
 
     @Test
-    public void getById() {
-        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+    public void getByUserByBooking() {
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
         Long userId = userService.add(userDto).getId();
-
         ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
-        Long itemId = itemService.add(itemDto, userId).getId();
+        Long itemId = itemService.add(itemDto, userId1).getId();
 
-        ItemBookingDto itemTest = itemService.getById(itemId, userId);
+        BookingDto bookingDto = BookingDto.builder().id(1L).itemId(itemId).status(BookingStatus.APPROVED)
+                .start(LocalDateTime.now()).end(LocalDateTime.now().plusNanos(2)).build();
+        long bookingId = bookingService.add(bookingDto, userId).getId();
+
+        List<ItemBookingDto> items = itemService.getByUser(userId1, 0, 1);
+
+        assertThat(1, equalTo(items.size()));
+        assertThat(itemId, equalTo(items.get(0).getId()));
+        assertThat("ItemName", equalTo(items.get(0).getName()));
+    }
+
+    @Test
+    public void getById() {
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId = userService.add(userDto).getId();
+        ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
+        Long itemId = itemService.add(itemDto, userId1).getId();
+
+        BookingDto bookingDto = BookingDto.builder().id(1L).itemId(itemId).status(BookingStatus.APPROVED)
+                .start(LocalDateTime.now()).end(LocalDateTime.now().plusNanos(2)).build();
+        long bookingId = bookingService.add(bookingDto, userId).getId();
+
+        ItemBookingDto itemTest = itemService.getById(itemId, userId1);
 
         assertThat(itemId, equalTo(itemTest.getId()));
         assertThat("ItemName", equalTo(itemTest.getName()));

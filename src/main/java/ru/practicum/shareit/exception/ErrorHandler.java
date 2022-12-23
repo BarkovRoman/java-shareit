@@ -85,9 +85,8 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleIllegalRequestException(IllegalRequestException e) {   // 400 BAD_REQUEST
+    public ResponseEntity<String> handleIllegalRequestException(IllegalRequestException e) {   // 400 BAD_REQUEST
         log.warn("Ошибка 400 {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

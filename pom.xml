@@ -172,7 +172,10 @@
                     <configuration>
                         <output>file</output>
                         <excludes>
-                            **/*MapperImpl.class
+                            <exclude>**/*BookingMapperImpl</exclude>
+                            <exclude>**/*ItemMapperImpl</exclude>
+                            <exclude>**/*ItemRequestMapperImpl</exclude>
+                            <exclude>**/*UserMapperImpl</exclude>
                         </excludes>
                     </configuration>
                     <executions>
@@ -188,6 +191,12 @@
                                 <goal>check</goal>
                             </goals>
                             <configuration>
+                                <excludes>
+                                    <exclude>**/*BookingMapperImpl</exclude>
+                                    <exclude>**/*ItemMapperImpl</exclude>
+                                    <exclude>**/*ItemRequestMapperImpl</exclude>
+                                    <exclude>**/*UserMapperImpl</exclude>
+                                </excludes>
                                 <rules>
                                     <rule>
                                         <element>BUNDLE</element>
