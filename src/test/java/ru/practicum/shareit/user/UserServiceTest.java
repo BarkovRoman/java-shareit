@@ -72,8 +72,7 @@ public class UserServiceTest {
         Long userId1 = userService.add(userDto1).getId();
 
         List<UserDto> usersTest = userService.getAll();
-
-        assertThat(users, equalTo(usersTest));
+        
         assertThat(2, equalTo(usersTest.size()));
 
         userService.delete(userId);
