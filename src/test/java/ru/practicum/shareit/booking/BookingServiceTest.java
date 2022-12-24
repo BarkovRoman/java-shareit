@@ -171,12 +171,14 @@ public class BookingServiceTest {
 
         BookingDto bookingDto = BookingDto.builder().id(1L).itemId(itemId).status(BookingStatus.APPROVED)
                 .start(LocalDateTime.now()).end(LocalDateTime.now().plusNanos(2)).build();
-        long bookingId = bookingService.add(bookingDto, userId).getId();
+        BookingResponseDto bookingResponseDto = bookingService.add(bookingDto, userId);
+        Long bookingId = bookingResponseDto.getId();
 
         BookingResponseDto booking = bookingService.getById(userId, bookingId);
 
         assertThat(userId, equalTo(booking.getBooker().getId()));
         assertThat(bookingId, equalTo(booking.getId()));
+        assertThat(bookingResponseDto, equalTo(booking));
     }
 
     @Test
@@ -360,18 +362,17 @@ public class BookingServiceTest {
 
     @Test
     public void bookingToBookingResponseDto() {
-        Booking booking = new Booking(1L,
-                LocalDateTime.now(),
-                LocalDateTime.now().plusSeconds(2),
-                BookingStatus.APPROVED,
-                new User(1L, "Name", "name@email.ru"),
-                new Item(1L, "ItemName", "ItemDescription", true,
-                        new ItemRequest(1L, "ItemRequestDescriion",
-                                new User(1L, "Name", "name@email.ru"), LocalDateTime.now()),
-                        1L));
+        User user = new User(1L, "Name", "user@mail.ru");
+        ItemRequest itemRequest = new ItemRequest(1L,"Description", user, LocalDateTime.now());
+        Item item = new Item(1L, "Name", "Description", true, itemRequest, 1L);
+        Booking booking = new Booking(1L, LocalDateTime.now(), LocalDateTime.now().plusSeconds(2),
+                BookingStatus.APPROVED, user, item);
+        BookingDto bookingDto = BookingDto.builder().id(1L).start(LocalDateTime.now())
+                .end(LocalDateTime.now().plusSeconds(2)).status(BookingStatus.APPROVED).itemId(1L).build();
 
-        BookingResponseDto bookingResponseDto = bookingMapper.bookingToBookingResponseDto(booking);
+        Booking booking1 = bookingMapper.toBooking(bookingDto, item, user);
 
-        assertThat(booking.getId(), equalTo(bookingResponseDto.getId()));
+        assertThat(booking, equalTo(booking));
+        assertThat(booking.hashCode(), equalTo(booking1.hashCode()));
     }
 }

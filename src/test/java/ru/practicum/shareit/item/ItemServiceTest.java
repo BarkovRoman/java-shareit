@@ -10,8 +10,10 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.*;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -155,7 +157,7 @@ public class ItemServiceTest {
 
         BookingDto bookingDto = BookingDto.builder().id(1L).itemId(itemId).status(BookingStatus.APPROVED)
                 .start(LocalDateTime.now()).end(LocalDateTime.now().plusNanos(2)).build();
-        long bookingId = bookingService.add(bookingDto, userId).getId();
+        bookingService.add(bookingDto, userId);
 
         ItemBookingDto itemTest = itemService.getById(itemId, userId1);
 
@@ -197,5 +199,32 @@ public class ItemServiceTest {
 
         assertThat(1L, equalTo(comment.getId()));
         assertThat("Name", equalTo(comment.getAuthorName()));
+    }
+
+    @Test
+    public void itemTest() {
+        User user = new User(1L, "Name", "user@mail.ru");
+        ItemRequest itemRequest = new ItemRequest(1L,"Description", user, LocalDateTime.now());
+        Item item = new Item(1L, "Name", "Description", true, itemRequest, 1L);
+        ItemDto itemDto = ItemDto.builder().id(1L).name("Name").description("Description").available(true).requestId(1L).build();
+
+        Item item1 = itemMapper.toItem(itemDto, 1L, itemRequest);
+
+        assertThat(item, equalTo(item1));
+        assertThat(item.hashCode(), equalTo(item1.hashCode()));
+    }
+
+    @Test
+    public void commentTest() {
+        User user = new User(1L, "Name", "user@mail.ru");
+        ItemRequest itemRequest = new ItemRequest(1L,"Description", user, LocalDateTime.now());
+        Item item = new Item(1L, "Name", "Description", true, itemRequest, 1L);
+        Comment comment = new Comment(1L, "Text", item, user, LocalDateTime.now());
+        CommentDto commentDto = CommentDto.builder().id(1L).text("Text").build();
+
+        Comment comment1 = itemMapper.toComment(commentDto, item, user);
+
+        assertThat(comment, equalTo(comment));
+        assertThat(comment.hashCode(), equalTo(comment1.hashCode()));
     }
 }

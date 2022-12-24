@@ -7,13 +7,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.request.dto.ItemRequestCreateDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.dto.ItemRequestMapper;
 import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -29,6 +32,7 @@ public class ItemRequestServiceTest {
     private final ItemRequestService itemRequestService;
     private final UserService userService;
     private final UserMapper userMapper;
+    private final ItemRequestMapper itemRequestMapper;
 
     @Test
     public void createRequest() {
@@ -88,5 +92,17 @@ public class ItemRequestServiceTest {
         assertThat(2, equalTo(requests.size()));
         assertThat(requestId, equalTo(requests.get(1).getId()));
         assertThat(requestId1, equalTo(requests.get(0).getId()));
+    }
+
+    @Test
+    public void itemRequestTest() {
+        User user = new User(1L, "Name", "user@mail.ru");
+        ItemRequest itemRequest = new ItemRequest(1L,"Description", user, LocalDateTime.now());
+        ItemRequestDto itemRequestDto = ItemRequestDto.builder().id(1L).description("Description").build();
+
+        ItemRequest itemRequest1 = itemRequestMapper.toItemRequest(itemRequestDto, user);
+
+        assertThat(itemRequest, equalTo(itemRequest1));
+        assertThat(itemRequest.hashCode(), equalTo(itemRequest1.hashCode()));
     }
 }
