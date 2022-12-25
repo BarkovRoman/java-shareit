@@ -362,17 +362,37 @@ public class BookingServiceTest {
 
     @Test
     public void bookingToBookingResponseDto() {
+        LocalDateTime time = LocalDateTime.now();
         User user = new User(1L, "Name", "user@mail.ru");
         ItemRequest itemRequest = new ItemRequest(1L,"Description", user, LocalDateTime.now());
         Item item = new Item(1L, "Name", "Description", true, itemRequest, 1L);
-        Booking booking = new Booking(1L, LocalDateTime.now(), LocalDateTime.now().plusSeconds(2),
+        Booking booking = new Booking(1L, time, LocalDateTime.now().plusSeconds(2),
                 BookingStatus.APPROVED, user, item);
-        BookingDto bookingDto = BookingDto.builder().id(1L).start(LocalDateTime.now())
+        BookingDto bookingDto = BookingDto.builder().id(1L).start(time)
                 .end(LocalDateTime.now().plusSeconds(2)).status(BookingStatus.APPROVED).itemId(1L).build();
 
         Booking booking1 = bookingMapper.toBooking(bookingDto, item, user);
+        booking1.setId(1L);
 
-        assertThat(booking, equalTo(booking));
+        assertThat(booking, equalTo(booking1));
         assertThat(booking.hashCode(), equalTo(booking1.hashCode()));
+    }
+
+    @Test
+    public void getByBookerIdAndStateError() {
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId = userService.add(userDto).getId();
+        ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
+        Long itemId = itemService.add(itemDto, userId1).getId();
+
+        BookingDto bookingDto = BookingDto.builder().id(1L).itemId(itemId).status(BookingStatus.APPROVED)
+                .start(LocalDateTime.now()).end(LocalDateTime.now().plusNanos(2)).build();
+        long bookingId = bookingService.add(bookingDto, userId).getId();
+
+        assertThatThrownBy(() -> {
+            List<BookingResponseDto> bookings = bookingService.getByBookerIdAndState(userId, Status.valueOf("error"), 0, 1);
+        }).isInstanceOf(IllegalArgumentException.class);
     }
 }

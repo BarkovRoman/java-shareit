@@ -12,6 +12,7 @@ import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -115,6 +116,17 @@ public class ItemControllerTest {
 
         assertEquals("Объекты не совпадают", items, response);
         assertEquals("Объекты не совпадают", itemDto, response.get(0));
+    }
+
+    @Test
+    public void searchItemEmptyList() {
+        List<ItemDto> items = Collections.emptyList();
+        Mockito.when(itemService.search("q",0, 5))
+                .thenReturn(items);
+
+        List<ItemDto> response = itemController.searchItem("q",0, 5);
+
+        assertEquals("Объекты не совпадают", items, response);
     }
 
     @Test

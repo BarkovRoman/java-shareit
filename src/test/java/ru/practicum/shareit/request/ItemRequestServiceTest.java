@@ -5,6 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemMapper;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.dto.ItemRequestCreateDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestMapper;
@@ -33,6 +37,8 @@ public class ItemRequestServiceTest {
     private final UserService userService;
     private final UserMapper userMapper;
     private final ItemRequestMapper itemRequestMapper;
+    private final ItemService itemService;
+    private final ItemMapper itemMapper;
 
     @Test
     public void createRequest() {
@@ -104,5 +110,27 @@ public class ItemRequestServiceTest {
 
         assertThat(itemRequest, equalTo(itemRequest1));
         assertThat(itemRequest.hashCode(), equalTo(itemRequest1.hashCode()));
+    }
+
+    @Test
+    public void getAll1() {
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId = userService.add(userDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+
+        ItemRequestDto itemRequestDto = ItemRequestDto.builder().id(1L).description("ItemRequestDescription").build();
+        ItemRequestDto itemRequestDto1 = ItemRequestDto.builder().id(2L).description("ItemRequestDescription1").build();
+        Long requestId = itemRequestService.add(itemRequestDto, userId1).getId();
+        Long requestId1 = itemRequestService.add(itemRequestDto1, userId1).getId();
+        ItemRequest itemRequest = itemRequestMapper.toItemRequest(itemRequestDto, new User(userId1, "Name", "User@mail.ru"));
+        ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, itemRequest, userId));
+        Long itemId = itemService.add(itemDto, userId).getId();
+
+        List<ItemRequestResponseDto> requests = itemRequestService.getAll(0, 3, userId);
+
+        assertThat(2, equalTo(requests.size()));
+        assertThat(requestId, equalTo(requests.get(1).getId()));
+        assertThat(requestId1, equalTo(requests.get(0).getId()));
     }
 }

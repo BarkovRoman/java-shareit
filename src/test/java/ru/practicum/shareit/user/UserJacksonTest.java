@@ -10,7 +10,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
-public class UserModelTest {
+public class UserJacksonTest {
     @Autowired
     private JacksonTester<UserDto> json;
 

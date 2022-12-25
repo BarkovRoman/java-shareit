@@ -172,10 +172,7 @@
                     <configuration>
                         <output>file</output>
                         <excludes>
-                            <exclude>**/*BookingMapperImpl</exclude>
-                            <exclude>**/*ItemMapperImpl</exclude>
-                            <exclude>**/*ItemRequestMapperImpl</exclude>
-                            <exclude>**/*UserMapperImpl</exclude>
+                            <exclude>**/*MapperImpl.*</exclude>
                         </excludes>
                     </configuration>
                     <executions>
@@ -192,10 +189,7 @@
                             </goals>
                             <configuration>
                                 <excludes>
-                                    <exclude>**/*BookingMapperImpl</exclude>
-                                    <exclude>**/*ItemMapperImpl</exclude>
-                                    <exclude>**/*ItemRequestMapperImpl</exclude>
-                                    <exclude>**/*UserMapperImpl</exclude>
+                                    <exclude>**/*MapperImpl.*</exclude>
                                 </excludes>
                                 <rules>
                                     <rule>

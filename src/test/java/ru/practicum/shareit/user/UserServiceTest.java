@@ -40,10 +40,22 @@ public class UserServiceTest {
     }
 
     @Test
+    public void updateUser() {
+        UserDto userDto = mapper.toUserDto(new User(0L, "Name", "UserNew@mail.ru"));
+        Long userId = userService.add(userDto).getId();
+        UserDto userDtoUpdate = mapper.toUserDto(new User(userId, " ", " "));
+
+        UserDto userDtoTest = userService.update(userDtoUpdate, userId);
+
+        assertThat(userId, equalTo(userDtoTest.getId()));
+        assertThat("Name", equalTo(userDtoTest.getName()));
+    }
+
+    @Test
     public void updateUserName() {
         UserDto userDto = mapper.toUserDto(new User(0L, "Name", "UserNew@mail.ru"));
         Long userId = userService.add(userDto).getId();
-        UserDto userDtoUpdate = mapper.toUserDto(new User(userId, "Update", "UserNew@mail.ru"));
+        UserDto userDtoUpdate = mapper.toUserDto(new User(userId, "Update", null));
 
         UserDto userDtoTest = userService.update(userDtoUpdate, userId);
 
@@ -56,7 +68,7 @@ public class UserServiceTest {
     public void updateUserEmail() {
         UserDto userDto = mapper.toUserDto(new User(0L, "Name", "UserNew@mail.ru"));
         Long userId = userService.add(userDto).getId();
-        UserDto userDtoUpdate = mapper.toUserDto(new User(userId, "Name", "UserUpdate@mail.ru"));
+        UserDto userDtoUpdate = mapper.toUserDto(new User(userId, null, "UserUpdate@mail.ru"));
 
         UserDto userDtoTest = userService.update(userDtoUpdate, userId);
 
