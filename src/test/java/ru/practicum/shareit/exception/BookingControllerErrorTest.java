@@ -27,9 +27,6 @@ public class BookingControllerErrorTest {
     private MockMvc mockMvc;
 
     @Autowired
-    BookingController bookingController;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
     @Test

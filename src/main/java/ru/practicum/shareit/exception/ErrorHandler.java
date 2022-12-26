@@ -65,8 +65,8 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMethodArgumentTypeMismatchExceptio(final MethodArgumentTypeMismatchException e) {   // 400 BAD_REQUEST
-        final String error = "Unknown " + e.getName() + ": " + e.getValue();
-        log.warn("Ошибка 400 {}", error);
+        final String error = String.format("Unknown %s: %s", e.getName(), e.getValue());
+        log.warn("Ошибка 400 Unknown {}: {}", e.getName(), e.getValue());
         return new ErrorResponse(error);
     }
 

@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,29 +83,22 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public List<ItemRequestResponseDto> getAll(Integer from, Integer size, Long userId) {
         Sort sortById = Sort.by(Sort.Direction.DESC, "created");
-        Pageable page = PageRequest.of(from, size, sortById);
+        final PageRequest page = PageRequest.of(from, size, sortById);
         List<ItemRequestResponseDto> itemRequestId = new ArrayList<>();
-        do {
-            Page<ItemRequest> requestPage = itemRequestRepository.findByRequestorIdNot(page, userId);
-            Map<ItemRequest, List<Item>> items = itemRepository.findByRequestIn(requestPage.getContent())
-                    .stream()
-                    .collect(groupingBy(Item::getRequest, toList()));
-            requestPage.getContent().forEach(request -> {
-                List<ItemRequestIdResponseDto> itemRequests;
-                int itemSize = 0;
-                if (items.containsKey(request)) {
-                    itemSize = items.get(request).size();
-                }
-                itemRequests = itemSize == 0 ? new ArrayList<>() : itemMapper.mapItemOwner(items.get(request));
-
-                itemRequestId.add(mapper.toItemRequestResponseDto(request, itemRequests));
-            });
-            if (requestPage.hasNext()) {
-                page = PageRequest.of(requestPage.getNumber() + 1, requestPage.getSize(), requestPage.getSort());
-            } else {
-                page = null;
+        Page<ItemRequest> requestPage = itemRequestRepository.findByRequestorIdNot(page, userId);
+        Map<ItemRequest, List<Item>> items = itemRepository.findByRequestIn(requestPage.getContent())
+                .stream()
+                .collect(groupingBy(Item::getRequest, toList()));
+        requestPage.getContent().forEach(request -> {
+            List<ItemRequestIdResponseDto> itemRequests;
+            int itemSize = 0;
+            if (items.containsKey(request)) {
+                itemSize = items.get(request).size();
             }
-        } while (page != null);
+            itemRequests = itemSize == 0 ? new ArrayList<>() : itemMapper.mapItemOwner(items.get(request));
+
+            itemRequestId.add(mapper.toItemRequestResponseDto(request, itemRequests));
+        });
         return itemRequestId;
     }
 

@@ -5,5 +5,5 @@ public enum BookingStatus {
     APPROVED,    // бронирование подтверждено владельцем
     REJECTED,    // бронирование отклонено владельцем
     PAST,     // завершённые
-    ALL    // Все
+    All, ALL    // Все
 }
