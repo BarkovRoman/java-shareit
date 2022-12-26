@@ -9,7 +9,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.user.controller.UserController;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -86,18 +85,24 @@ public class UserControllerTest {
     public void update() throws Exception {
         // given
         long userId = 1L;
-
-        when(userService.update(any(), anyLong())).thenReturn(userDto);
         // when + then
+        when(userService.update(any(), anyLong())).thenReturn(userDto);
         mockMvc.perform(patch("/users/{userId}", 1L)
                         .header("X-Sharer-User-Id", userId)
+                        .content(objectMapper.writeValueAsString(userDto))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(HttpMessageNotReadableException.class));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(userDto.getId()));
     }
 
     @Test
-    public void delete() throws Exception {
-
+    public void deleteById() throws Exception {
+        // given
+        long userId = 1L;
+        // when + then
+        mockMvc.perform(delete("/users/{userId}", 1L)
+                        .header("X-Sharer-User-Id", userId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 }

@@ -315,7 +315,7 @@ public class ItemServiceTest {
         List<ItemDto> items = itemService.search("descrip", 1, 1);
 
         assertThat(1, equalTo(items.size()));
-        assertThat(itemId3, equalTo(items.get(0).getId()));
+        assertThat(itemId1, equalTo(items.get(0).getId()));
     }
 
     @Test
