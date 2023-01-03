@@ -5,6 +5,7 @@ import org.mapstruct.Mapping;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
@@ -12,10 +13,13 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ItemMapper {
 
-    @Mapping(target = "id", source = "itemId")
+    @Mapping(target = "id", source = "itemDto.id")
     @Mapping(target = "owner", source = "userId")
-    Item toItem(ItemDto itemDto, Long userId, Long itemId);
+    @Mapping(target = "request", source = "request")
+    @Mapping(target = "description", source = "itemDto.description")
+    Item toItem(ItemDto itemDto, Long userId, ItemRequest request);
 
+    @Mapping(target = "requestId", source = "item.request.id")
     ItemDto toItemDto(Item item);
 
     @Mapping(target = "author", source = "user")
@@ -35,6 +39,16 @@ public interface ItemMapper {
         commentResponseDto.setCreated(comment.getCreated());
         commentResponseDto.setAuthorName(comment.getAuthor().getName());
         return commentResponseDto;
+    }
+
+    List<ItemRequestIdResponseDto> mapItemOwner(List<Item> items);
+
+    default ItemRequestIdResponseDto mapItemOwner(Item items) {
+        return new ItemRequestIdResponseDto(items.getId(),
+                items.getName(),
+                items.getDescription(),
+                items.getAvailable(),
+                items.getRequest().getId());
     }
 
     @Mapping(target = "id", source = "booking.id")

@@ -2,6 +2,8 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,10 +20,11 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static ru.practicum.shareit.booking.model.BookingStatus.PAST;
 
 @Slf4j
 @Service
@@ -49,9 +52,9 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException(String.format("Booking id=%s не найден", bookingId)));
         if (!booking.getItem().getOwner().equals(userId)) {
-            throw new NotFoundException(String.format("Item id=%s не пренадлежит User id=%s", bookingId, userId));
+            throw new NotFoundException(String.format("Item id=%s не принадлежит User id=%s", bookingId, userId));
         }
-        if (booking.getStatus() == BookingStatus.APPROVED) {
+        if (booking.getStatus() == BookingStatus.APPROVED && approved.equals(true)) {
             throw new IllegalRequestException(String.format("Booking id=%s уже имеет статус подтверждения", bookingId));
         }
         if (approved) booking.setStatus(BookingStatus.APPROVED);
@@ -68,48 +71,52 @@ public class BookingServiceImpl implements BookingService {
             return mapper.bookingToBookingResponseDto(booking);
         }
         throw new NotFoundException(String.format(
-                "Booking id=%s не пренадлежит User id=%s", bookingId, userId));
+                "Booking id=%s не принадлежит User id=%s", bookingId, userId));
     }
 
     @Override
-    public List<BookingResponseDto> getByBookerIdAndState(Long userId, Status state) {
+    public List<BookingResponseDto> getByBookerIdAndState(Long userId, Status state, Integer from, Integer size) {
         isExistsUserById(userId);
-        BookingStatus status = isExistsStatus(state);
-
-        if (status.equals(BookingStatus.PAST)) {
-            return bookingRepository.findByBooker_IdAndStatusAndEndBefore(userId,
-                            BookingStatus.APPROVED,
-                            LocalDateTime.now(),
-                            Sort.by(Sort.Direction.DESC, "end")).stream()
-                    .map(mapper::bookingToBookingResponseDto)
-                    .collect(Collectors.toList());
+        Sort sort = Sort.by(Sort.Direction.DESC, "end");
+        final PageRequest page = PageRequest.of(from, size, sort);
+        Page<Booking> bookings;
+        switch (isExistsStatus(state)) {
+            case PAST:
+                bookings = bookingRepository.findByBooker_IdAndStatusAndEndBefore(userId,
+                        BookingStatus.APPROVED,
+                        LocalDateTime.now(),
+                        page);
+                break;
+            case ALL:
+                final PageRequest page1 = PageRequest.of((from / size), size, sort);
+                bookings = bookingRepository.findByBookerId(userId, page1);
+                break;
+            default:
+                bookings = bookingRepository.findByBookerIdAndStatus(userId, isExistsStatus(state), page);
+                break;
         }
-
-        if (!status.equals(BookingStatus.ALL)) {
-            return bookingRepository.findByBookerIdAndStatus(userId, status, Sort.by(Sort.Direction.DESC, "end")).stream()
-                    .map(mapper::bookingToBookingResponseDto)
-                    .collect(Collectors.toList());
-        }
-        return bookingRepository.findByBookerId(userId, Sort.by(Sort.Direction.DESC, "end")).stream()
+        return bookings.getContent().stream()
                 .map(mapper::bookingToBookingResponseDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<BookingResponseDto> getAllOwnerId(Long userId, Status state) {
+    public List<BookingResponseDto> getAllOwnerId(Long userId, Status state, Integer from, Integer size) {
         isExistsUserById(userId);
-        BookingStatus status = isExistsStatus(state);
-        if (status.equals(BookingStatus.PAST)) {
-            return bookingRepository.findByOwnerIdAndStatusIsBefore(userId, BookingStatus.APPROVED, LocalDateTime.now()).stream()
-                    .map(mapper::bookingToBookingResponseDto)
-                    .collect(Collectors.toList());
+        final PageRequest page = PageRequest.of(from, size);
+        Page<Booking> bookings;
+        switch (isExistsStatus(state)) {
+            case PAST:
+                bookings = bookingRepository.findByOwnerIdAndStatusIsBefore(userId, BookingStatus.APPROVED, LocalDateTime.now(), page);
+                break;
+            case ALL:
+                bookings = bookingRepository.findByOwnerId(userId, page);
+                break;
+            default:
+                bookings = bookingRepository.findByOwnerIdAndStatus(userId, isExistsStatus(state), page);
+                break;
         }
-        if (!status.equals(BookingStatus.ALL)) {
-            return bookingRepository.findByOwnerIdAndStatus(userId, status).stream()
-                    .map(mapper::bookingToBookingResponseDto)
-                    .collect(Collectors.toList());
-        }
-        return bookingRepository.findByOwnerId(userId).stream()
+        return bookings.stream()
                 .map(mapper::bookingToBookingResponseDto)
                 .collect(Collectors.toList());
     }
@@ -133,19 +140,20 @@ public class BookingServiceImpl implements BookingService {
 
     private BookingStatus isExistsStatus(Status status) {
         switch (status) {
-            case REJECTED :
-            case CURRENT :
+            case REJECTED:
+            case CURRENT:
                 return BookingStatus.REJECTED;
-            case APPROVED :
+            case APPROVED:
                 return BookingStatus.APPROVED;
-            case PAST :
-                return BookingStatus.PAST;
-            case WAITING :
+            case PAST:
+                return PAST;
+            case WAITING:
                 return BookingStatus.WAITING;
-            case ALL :
-            case FUTURE :
+            case ALL:
+            case FUTURE:
                 return BookingStatus.ALL;
-            default: throw new IllegalRequestException("Unknown state: UNSUPPORTED_STATUS");
+            default:
+                throw new IllegalRequestException("Unknown state: UNSUPPORTED_STATUS");
         }
     }
 }

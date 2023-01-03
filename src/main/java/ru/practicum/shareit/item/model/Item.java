@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
+import ru.practicum.shareit.request.model.ItemRequest;
 
 import javax.persistence.*;
 
@@ -21,7 +22,9 @@ public class Item {
     @Column(name = "is_available", nullable = false)
     private Boolean available; // статус доступности
 
-    //private ItemRequest request; // ссылка на запрос создания вещи другого пользователя
+    @OneToOne
+    @JoinColumn(name = "request_id")
+    private ItemRequest request; // ссылка на запрос создания вещи другого пользователя
 
     @Column(name = "owner_id")
     private Long owner;

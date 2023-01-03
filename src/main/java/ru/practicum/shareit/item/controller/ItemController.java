@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CommentResponseDto;
@@ -9,11 +10,14 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collections;
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping("/items")
 public class ItemController {
     private final ItemService itemService;
@@ -32,8 +36,10 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemBookingDto> getByUser(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        return itemService.getByUser(userId);
+    public List<ItemBookingDto> getByUser(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                          @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                          @RequestParam(defaultValue = "5") @Positive Integer size) {
+        return itemService.getByUser(userId, from, size);
     }
 
     @GetMapping("/{itemId}")
@@ -43,8 +49,10 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItem(@RequestParam String text) {
-        return text.isBlank() ? Collections.emptyList() : itemService.search(text);
+    public List<ItemDto> searchItem(@RequestParam String text,
+                                    @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                    @RequestParam(defaultValue = "5") @Positive Integer size) {
+        return text.isBlank() ? Collections.emptyList() : itemService.search(text, from, size);
     }
 
     @PostMapping("/{itemId}/comment")
