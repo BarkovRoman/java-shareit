@@ -10,10 +10,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import ru.practicum.shareit.booking.controller.BookingControllerServer;
+import ru.practicum.shareit.booking.dto.BookerResponseDto;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingResponseDto;
+import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.dto.ItemResponseDto;
 
-import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,7 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(BookingController.class)
+@WebMvcTest(BookingControllerServer.class)
 @AutoConfigureMockMvc
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class BookingControllerSTest {
@@ -107,7 +111,7 @@ public class BookingControllerSTest {
 
         when(bookingService.getByBookerIdAndState(anyLong(), any(), anyInt(), anyInt())).thenReturn(bookings);
         // when + then
-        mockMvc.perform(get("/bookings")
+        mockMvc.perform(get("/bookings?state=ALL&from=0&size=10")
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -123,40 +127,11 @@ public class BookingControllerSTest {
 
         when(bookingService.getAllOwnerId(anyLong(), any(), anyInt(), anyInt())).thenReturn(bookings);
         // when + then
-        mockMvc.perform(get("/bookings/owner")
+        mockMvc.perform(get("/bookings/owner?state=ALL&from=0&size=10")
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id").value(bookings.get(0).getId()));
-    }
-
-    @Test
-    public void saveNewBookingStartEnd() throws Exception {
-        bookingDto = BookingDto.builder().id(1L).itemId(1L).status(BookingStatus.APPROVED)
-                .start(LocalDateTime.now()).end(LocalDateTime.now()).build();
-        mockMvc.perform(
-                        post("/bookings")
-                                .header("X-Sharer-User-Id", 1L)
-                                .content(objectMapper.writeValueAsString(bookingDto))
-                                .contentType(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isBadRequest())
-                .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(MethodArgumentNotValidException.class));
-    }
-
-    @Test
-    public void getAllOwnerId1() throws Exception {
-        // given
-        long userId = 1L;
-        List<BookingResponseDto> bookings = List.of(bookingResponseDto);
-
-        when(bookingService.getAllOwnerId(anyLong(), any(), anyInt(), anyInt())).thenReturn(bookings);
-        // when + then
-        mockMvc.perform(get("/bookings/owner?size=-2")
-                        .header("X-Sharer-User-Id", userId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(ConstraintViolationException.class));
     }
 }

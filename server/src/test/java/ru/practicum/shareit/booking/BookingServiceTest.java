@@ -5,6 +5,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingMapper;
+import ru.practicum.shareit.booking.dto.BookingResponseDto;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.model.Status;
+import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.ExistingValidationException;
 import ru.practicum.shareit.exception.IllegalRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -13,7 +20,7 @@ import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.model.ItemRequest;
-import ru.practicum.shareit.user.dto.UserRequestDto;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
@@ -41,10 +48,10 @@ public class BookingServiceTest {
 
     @Test
     public void createBooking() {
-        UserRequestDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId1 = userService.add(userRequestDto1).getId();
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId = userService.add(userDto).getId();
         ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
         Long itemId = itemService.add(itemDto, userId1).getId();
 
@@ -60,10 +67,10 @@ public class BookingServiceTest {
 
     @Test
     public void createBookingAvailableFalse() {
-        UserRequestDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId1 = userService.add(userRequestDto1).getId();
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId = userService.add(userDto).getId();
         ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", false, null, userId));
         Long itemId = itemService.add(itemDto, userId1).getId();
 
@@ -77,10 +84,10 @@ public class BookingServiceTest {
 
     @Test
     public void createBookingNotUser() {
-        UserRequestDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId1 = userService.add(userRequestDto1).getId();
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId = userService.add(userDto).getId();
         ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
         Long itemId = itemService.add(itemDto, userId1).getId();
 
@@ -95,10 +102,10 @@ public class BookingServiceTest {
 
     @Test
     public void updateBooking() {
-        UserRequestDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId1 = userService.add(userRequestDto1).getId();
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId = userService.add(userDto).getId();
         ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
         Long itemId = itemService.add(itemDto, userId1).getId();
 
@@ -117,10 +124,10 @@ public class BookingServiceTest {
 
     @Test
     public void updateBookingUserNotBooking() {
-        UserRequestDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId1 = userService.add(userRequestDto1).getId();
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId = userService.add(userDto).getId();
         ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
         Long itemId = itemService.add(itemDto, userId1).getId();
 
@@ -136,10 +143,10 @@ public class BookingServiceTest {
 
     @Test
     public void updateBookingApproved() {
-        UserRequestDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId1 = userService.add(userRequestDto1).getId();
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId = userService.add(userDto).getId();
         ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
         Long itemId = itemService.add(itemDto, userId1).getId();
 
@@ -155,10 +162,10 @@ public class BookingServiceTest {
 
     @Test
     public void getById() {
-        UserRequestDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId1 = userService.add(userRequestDto1).getId();
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId = userService.add(userDto).getId();
         ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
         Long itemId = itemService.add(itemDto, userId1).getId();
 
@@ -176,10 +183,10 @@ public class BookingServiceTest {
 
     @Test
     public void getByBookerIdAndStateApproved() {
-        UserRequestDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId1 = userService.add(userRequestDto1).getId();
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId = userService.add(userDto).getId();
         ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
         Long itemId = itemService.add(itemDto, userId1).getId();
 
@@ -196,10 +203,10 @@ public class BookingServiceTest {
 
     @Test
     public void getByBookerIdAndStateAll() {
-        UserRequestDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId1 = userService.add(userRequestDto1).getId();
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId = userService.add(userDto).getId();
         ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
         Long itemId = itemService.add(itemDto, userId1).getId();
 
@@ -216,10 +223,10 @@ public class BookingServiceTest {
 
     @Test
     public void getByBookerIdAndStatePast() {
-        UserRequestDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId1 = userService.add(userRequestDto1).getId();
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId = userService.add(userDto).getId();
         ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
         Long itemId = itemService.add(itemDto, userId1).getId();
 
@@ -236,10 +243,10 @@ public class BookingServiceTest {
 
     @Test
     public void getAllOwnerIdStatusAll() {
-        UserRequestDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId1 = userService.add(userRequestDto1).getId();
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId = userService.add(userDto).getId();
         ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
         Long itemId = itemService.add(itemDto, userId1).getId();
 
@@ -256,10 +263,10 @@ public class BookingServiceTest {
 
     @Test
     public void getAllOwnerIdStatusPast() {
-        UserRequestDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId1 = userService.add(userRequestDto1).getId();
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId = userService.add(userDto).getId();
         ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
         Long itemId = itemService.add(itemDto, userId1).getId();
 
@@ -276,10 +283,10 @@ public class BookingServiceTest {
 
     @Test
     public void getAllOwnerIdStatusApproved() {
-        UserRequestDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId1 = userService.add(userRequestDto1).getId();
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId = userService.add(userDto).getId();
         ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
         Long itemId = itemService.add(itemDto, userId1).getId();
 
@@ -296,10 +303,10 @@ public class BookingServiceTest {
 
     @Test
     public void getAllOwnerIdStatusRejected() {
-        UserRequestDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId1 = userService.add(userRequestDto1).getId();
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId = userService.add(userDto).getId();
         ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
         Long itemId = itemService.add(itemDto, userId1).getId();
 
@@ -316,10 +323,10 @@ public class BookingServiceTest {
 
     @Test
     public void getByBookerIdAndStateWaiting() {
-        UserRequestDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId1 = userService.add(userRequestDto1).getId();
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId = userService.add(userDto).getId();
         ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
         Long itemId = itemService.add(itemDto, userId1).getId();
 
@@ -336,10 +343,10 @@ public class BookingServiceTest {
 
     @Test
     public void getByIdNotBookerNotUser() {
-        UserRequestDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId1 = userService.add(userRequestDto1).getId();
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId = userService.add(userDto).getId();
         ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
         Long itemId = itemService.add(itemDto, userId1).getId();
 
@@ -373,10 +380,10 @@ public class BookingServiceTest {
 
     @Test
     public void getByBookerIdAndStateError() {
-        UserRequestDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId1 = userService.add(userRequestDto1).getId();
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId = userService.add(userDto).getId();
         ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
         Long itemId = itemService.add(itemDto, userId1).getId();
 

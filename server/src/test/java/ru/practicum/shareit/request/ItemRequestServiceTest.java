@@ -10,12 +10,12 @@ import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.dto.ItemRequestCreateDto;
-import ru.practicum.shareit.request.dto.RequestDto;
+import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestMapper;
 import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.service.ItemRequestService;
-import ru.practicum.shareit.user.dto.UserRequestDto;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
@@ -42,12 +42,12 @@ public class ItemRequestServiceTest {
 
     @Test
     public void createRequest() {
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
-        UserRequestDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId = userService.add(userDto).getId();
+        UserDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
         Long userId1 = userService.add(userRequestDto1).getId();
 
-        RequestDto itemRequestDto = RequestDto.builder().id(1L).description("ItemRequestDescription").build();
+        ItemRequestDto itemRequestDto = ItemRequestDto.builder().id(1L).description("ItemRequestDescription").build();
 
         ItemRequestCreateDto request = itemRequestService.add(itemRequestDto, userId1);
 
@@ -56,9 +56,9 @@ public class ItemRequestServiceTest {
 
     @Test
     public void getByUser() {
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
-        RequestDto itemRequestDto = RequestDto.builder().id(1L).description("ItemRequestDescription").build();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId = userService.add(userDto).getId();
+        ItemRequestDto itemRequestDto = ItemRequestDto.builder().id(1L).description("ItemRequestDescription").build();
         Long requestId = itemRequestService.add(itemRequestDto, userId).getId();
 
         List<ItemRequestResponseDto> requests = itemRequestService.getByUser(userId);
@@ -69,11 +69,11 @@ public class ItemRequestServiceTest {
 
     @Test
     public void getById() {
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
-        UserRequestDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId1 = userService.add(userRequestDto1).getId();
-        RequestDto itemRequestDto = RequestDto.builder().id(1L).description("ItemRequestDescription").build();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId = userService.add(userDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        ItemRequestDto itemRequestDto = ItemRequestDto.builder().id(1L).description("ItemRequestDescription").build();
         Long requestId = itemRequestService.add(itemRequestDto, userId).getId();
 
         ItemRequestResponseDto request = itemRequestService.getById(requestId, userId1);
@@ -84,12 +84,12 @@ public class ItemRequestServiceTest {
 
     @Test
     public void getAll() {
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
-        UserRequestDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId1 = userService.add(userRequestDto1).getId();
-        RequestDto itemRequestDto = RequestDto.builder().id(1L).description("ItemRequestDescription").build();
-        RequestDto itemRequestDto1 = RequestDto.builder().id(2L).description("ItemRequestDescription1").build();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId = userService.add(userDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
+        ItemRequestDto itemRequestDto = ItemRequestDto.builder().id(1L).description("ItemRequestDescription").build();
+        ItemRequestDto itemRequestDto1 = ItemRequestDto.builder().id(2L).description("ItemRequestDescription1").build();
         Long requestId = itemRequestService.add(itemRequestDto, userId1).getId();
         Long requestId1 = itemRequestService.add(itemRequestDto1, userId1).getId();
 
@@ -104,7 +104,7 @@ public class ItemRequestServiceTest {
     public void itemRequestTest() {
         User user = new User(1L, "Name", "user@mail.ru");
         ItemRequest itemRequest = new ItemRequest(1L,"Description", user, LocalDateTime.now());
-        RequestDto itemRequestDto = RequestDto.builder().id(1L).description("Description").build();
+        ItemRequestDto itemRequestDto = ItemRequestDto.builder().id(1L).description("Description").build();
 
         ItemRequest itemRequest1 = itemRequestMapper.toItemRequest(itemRequestDto, user);
 
@@ -114,13 +114,13 @@ public class ItemRequestServiceTest {
 
     @Test
     public void getAll1() {
-        UserRequestDto userRequestDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
-        UserRequestDto userRequestDto1 = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId1 = userService.add(userRequestDto1).getId();
+        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        Long userId = userService.add(userDto).getId();
+        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
+        Long userId1 = userService.add(userDto1).getId();
 
-        RequestDto itemRequestDto = RequestDto.builder().id(1L).description("ItemRequestDescription").build();
-        RequestDto itemRequestDto1 = RequestDto.builder().id(2L).description("ItemRequestDescription1").build();
+        ItemRequestDto itemRequestDto = ItemRequestDto.builder().id(1L).description("ItemRequestDescription").build();
+        ItemRequestDto itemRequestDto1 = ItemRequestDto.builder().id(2L).description("ItemRequestDescription1").build();
         Long requestId = itemRequestService.add(itemRequestDto, userId1).getId();
         Long requestId1 = itemRequestService.add(itemRequestDto1, userId1).getId();
         ItemRequest itemRequest = itemRequestMapper.toItemRequest(itemRequestDto, new User(userId1, "Name", "User@mail.ru"));

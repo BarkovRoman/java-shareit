@@ -13,11 +13,11 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @StartBeforeEndDateValid
 public class ItemRequestDto {
-    @NotBlank
+    @NotBlank(message = "name NotBlank")
     String name;
-    @NotBlank
+    @NotBlank(message = "description NotBlank")
     String description;
-    @NotNull
+    @NotNull(message = "available NotNull")
     Boolean available; // статус доступности
     Long requestId;
 }

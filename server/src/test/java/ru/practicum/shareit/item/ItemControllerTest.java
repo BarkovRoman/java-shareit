@@ -10,7 +10,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.item.controller.ItemController;
+import ru.practicum.shareit.item.controller.ItemControllerServer;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.service.ItemService;
 
 import java.time.LocalDateTime;
@@ -24,7 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(ItemController.class)
+@WebMvcTest(ItemControllerServer.class)
 @AutoConfigureMockMvc
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ItemControllerTest {
@@ -118,7 +119,7 @@ public class ItemControllerTest {
 
         when(itemService.search(anyString(), anyInt(), anyInt())).thenReturn(items);
         // when + then
-        mockMvc.perform(get("/items/search?text=desc")
+        mockMvc.perform(get("/items/search?text=desc&from=0&size=10")
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

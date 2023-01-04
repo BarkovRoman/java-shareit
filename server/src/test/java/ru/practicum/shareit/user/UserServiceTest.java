@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.practicum.shareit.user.dto.UserRequestDto;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
@@ -28,63 +28,63 @@ public class UserServiceTest {
 
     @Test
     public void createUser() {
-        UserRequestDto userRequestDto = mapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
+        UserDto userDto = mapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
 
-        UserRequestDto userRequestDto1 = userService.add(userRequestDto);
-        Long userId = userRequestDto1.getId();
-        UserRequestDto userRequestDtoTest = userService.getById(userId);
+        UserDto userDto1 = userService.add(userDto);
+        Long userId = userDto1.getId();
+        UserDto userDtoTest = userService.getById(userId);
 
 
-        MatcherAssert.assertThat("User@mail.ru", equalTo(userRequestDtoTest.getEmail()));
-        MatcherAssert.assertThat(userId, equalTo(userRequestDtoTest.getId()));
-        assertThat(userRequestDto1, equalTo(userRequestDtoTest));
+        MatcherAssert.assertThat("User@mail.ru", equalTo(userDtoTest.getEmail()));
+        MatcherAssert.assertThat(userId, equalTo(userDtoTest.getId()));
+        assertThat(userDto1, equalTo(userDtoTest));
     }
 
     @Test
     public void updateUser() {
-        UserRequestDto userRequestDto = mapper.toUserDto(new User(0L, "Name", "UserNew@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
-        UserRequestDto userRequestDtoUpdate = mapper.toUserDto(new User(userId, " ", " "));
+        UserDto userDto = mapper.toUserDto(new User(0L, "Name", "UserNew@mail.ru"));
+        Long userId = userService.add(userDto).getId();
+        UserDto userDtoUpdate = mapper.toUserDto(new User(userId, " ", " "));
 
-        UserRequestDto userRequestDtoTest = userService.update(userRequestDtoUpdate, userId);
+        UserDto userDtoTest = userService.update(userDtoUpdate, userId);
 
-        MatcherAssert.assertThat(userId, equalTo(userRequestDtoTest.getId()));
-        MatcherAssert.assertThat("Name", equalTo(userRequestDtoTest.getName()));
+        MatcherAssert.assertThat(userId, equalTo(userDtoTest.getId()));
+        MatcherAssert.assertThat("Name", equalTo(userDtoTest.getName()));
     }
 
     @Test
     public void updateUserName() {
-        UserRequestDto userRequestDto = mapper.toUserDto(new User(0L, "Name", "UserNew@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
-        UserRequestDto userRequestDtoUpdate = mapper.toUserDto(new User(userId, "Update", null));
+        UserDto userDto = mapper.toUserDto(new User(0L, "Name", "UserNew@mail.ru"));
+        Long userId = userService.add(userDto).getId();
+        UserDto userDtoUpdate = mapper.toUserDto(new User(userId, "Update", null));
 
-        UserRequestDto userRequestDtoTest = userService.update(userRequestDtoUpdate, userId);
+        UserDto userDtoTest = userService.update(userDtoUpdate, userId);
 
-        MatcherAssert.assertThat(userId, equalTo(userRequestDtoTest.getId()));
-        MatcherAssert.assertThat("Update", equalTo(userRequestDtoTest.getName()));
-        MatcherAssert.assertThat("UserNew@mail.ru", equalTo(userRequestDtoTest.getEmail()));
+        MatcherAssert.assertThat(userId, equalTo(userDtoTest.getId()));
+        MatcherAssert.assertThat("Update", equalTo(userDtoTest.getName()));
+        MatcherAssert.assertThat("UserNew@mail.ru", equalTo(userDtoTest.getEmail()));
     }
 
     @Test
     public void updateUserEmail() {
-        UserRequestDto userRequestDto = mapper.toUserDto(new User(0L, "Name", "UserNew@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
-        UserRequestDto userRequestDtoUpdate = mapper.toUserDto(new User(userId, null, "UserUpdate@mail.ru"));
+        UserDto userDto = mapper.toUserDto(new User(0L, "Name", "UserNew@mail.ru"));
+        Long userId = userService.add(userDto).getId();
+        UserDto userDtoUpdate = mapper.toUserDto(new User(userId, null, "UserUpdate@mail.ru"));
 
-        UserRequestDto userRequestDtoTest = userService.update(userRequestDtoUpdate, userId);
+        UserDto userDtoTest = userService.update(userDtoUpdate, userId);
 
-        MatcherAssert.assertThat(userId, equalTo(userRequestDtoTest.getId()));
-        MatcherAssert.assertThat("Name", equalTo(userRequestDtoTest.getName()));
-        MatcherAssert.assertThat("UserUpdate@mail.ru", equalTo(userRequestDtoTest.getEmail()));
+        MatcherAssert.assertThat(userId, equalTo(userDtoTest.getId()));
+        MatcherAssert.assertThat("Name", equalTo(userDtoTest.getName()));
+        MatcherAssert.assertThat("UserUpdate@mail.ru", equalTo(userDtoTest.getEmail()));
     }
 
     @Test
     public void getAllDeleteUser() {
-        UserRequestDto userRequestDto = mapper.toUserDto(new User(1L, "Name", "UserNew@mail.ru"));
-        UserRequestDto userRequestDto1 = mapper.toUserDto(new User(2L, "Name", "UserNew1@mail.ru"));
-        Long userId = userService.add(userRequestDto).getId();
-        Long userId1 = userService.add(userRequestDto1).getId();
-        List<UserRequestDto> usersTest = userService.getAll();
+        UserDto userDto = mapper.toUserDto(new User(1L, "Name", "UserNew@mail.ru"));
+        UserDto userDto1 = mapper.toUserDto(new User(2L, "Name", "UserNew1@mail.ru"));
+        Long userId = userService.add(userDto).getId();
+        Long userId1 = userService.add(userDto1).getId();
+        List<UserDto> usersTest = userService.getAll();
 
         assertThat(2, equalTo(usersTest.size()));
 
@@ -98,9 +98,9 @@ public class UserServiceTest {
     @Test
     public void userTest() {
         User user = new User(1L, "Name", "user@mail.ru");
-        UserRequestDto userRequestDto = UserRequestDto.builder().id(1L).name("Name").email("UserNew@mail.ru").build();
+        UserDto userDto = UserDto.builder().id(1L).name("Name").email("UserNew@mail.ru").build();
 
-        User user1 = mapper.toUser(userRequestDto, 1L);
+        User user1 = mapper.toUser(userDto, 1L);
 
         assertThat(user, equalTo(user1));
         assertThat(user.hashCode(), equalTo(user1.hashCode()));

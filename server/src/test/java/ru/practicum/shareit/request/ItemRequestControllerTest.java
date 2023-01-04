@@ -10,7 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.request.controller.ItemRequestController;
+import ru.practicum.shareit.request.controller.ItemRequestControllerServer;
 import ru.practicum.shareit.request.dto.ItemRequestCreateDto;
 import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(ItemRequestController.class)
+@WebMvcTest(ItemRequestControllerServer.class)
 @AutoConfigureMockMvc
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ItemRequestControllerTest {
@@ -99,7 +99,7 @@ public class ItemRequestControllerTest {
 
         when(itemRequestService.getAll(anyInt(), anyInt(), anyLong())).thenReturn(items);
         // when + then
-        mockMvc.perform(get("/requests/all", 1L)
+        mockMvc.perform(get("/requests/all?from=0&size=10", 1L)
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

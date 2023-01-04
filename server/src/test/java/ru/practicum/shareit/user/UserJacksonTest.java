@@ -5,20 +5,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
-import ru.practicum.shareit.user.dto.UserRequestDto;
+import ru.practicum.shareit.user.dto.UserDto;
+
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
 public class UserJacksonTest {
     @Autowired
-    private JacksonTester<UserRequestDto> json;
+    private JacksonTester<UserDto> json;
 
     @Test
     void testUserDto() throws Exception {
-        UserRequestDto userRequestDto = UserRequestDto.builder().id(1L).name("John").email("john.doe@mail.com").build();
+        UserDto userRequestDto = UserDto.builder().id(1L).name("John").email("john.doe@mail.com").build();
 
-        JsonContent<UserRequestDto> result = json.write(userRequestDto);
+        JsonContent<UserDto> result = json.write(userRequestDto);
 
         assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.name").isEqualTo("John");

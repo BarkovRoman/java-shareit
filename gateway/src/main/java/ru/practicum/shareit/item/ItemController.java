@@ -20,9 +20,10 @@ import javax.validation.constraints.PositiveOrZero;
 @Validated
 public class ItemController {
     private final ItemClient itemClient;
+
     @PostMapping
     public ResponseEntity<Object> add(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                      @RequestBody @Valid ItemRequestDto itemDto) {
+                                      @Valid @RequestBody ItemRequestDto itemDto) {
         log.info("Creating item {}, userId={}", itemDto, userId);
         return itemClient.add(itemDto, userId);
     }

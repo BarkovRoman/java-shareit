@@ -1,10 +1,11 @@
 package ru.practicum.shareit.user.dto;
 
 import lombok.*;
+import lombok.extern.jackson.Jacksonized;
 
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@Value
+@Builder
+@Jacksonized
 public class UserDto {
     Long id;
     String name;
