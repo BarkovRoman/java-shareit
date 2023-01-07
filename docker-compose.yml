@@ -32,7 +32,7 @@ services:
     ports:
       - "6541:5432"
     environment:
-      - POSTGRES_DB=shareit
+      - DB_NAME=shareit
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
       - DB_HOST=db
