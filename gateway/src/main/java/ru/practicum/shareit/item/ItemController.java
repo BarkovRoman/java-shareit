@@ -39,7 +39,7 @@ public class ItemController {
     @GetMapping
     public ResponseEntity<Object> getByUser(@RequestHeader("X-Sharer-User-Id") Long userId,
                                             @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                            @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+                                            @Positive @RequestParam(name = "size", defaultValue = "2") Integer size) {
         log.info("Get item by userId={}, from={}, size={}", userId, from, size);
         return itemClient.getByUser(userId, from, size);
     }

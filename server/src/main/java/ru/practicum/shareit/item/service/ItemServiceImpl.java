@@ -79,7 +79,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemBookingDto> getByUser(Long userId, Integer from, Integer size) {
         isExistsUserById(userId);
-        final PageRequest page = PageRequest.of((from / size), size);
+        Sort sort = Sort.by(ASC, "id");
+        final PageRequest page = PageRequest.of((from / size), size, sort);
         List<ItemBookingDto> itemBookingDto = new ArrayList<>();
         Page<Item> items = itemRepository.findByOwner(page, userId);
         Map<Item, List<Comment>> comments = commentRepository.findByItemIn(items.getContent(), Sort.by(DESC, "created"))
@@ -99,12 +100,14 @@ public class ItemServiceImpl implements ItemService {
             itemBookingDto.add(mapper.toItemBookingCommentDto(item,
                     bookigsSize == 0 ? null : mapper.toLastNextItemDto(bookings.get(item)
                             .stream()
-                            .filter(date -> date.getStart().isAfter(LocalDateTime.now()))
-                            .max((o1, o2) -> o2.getEnd().compareTo(o1.getEnd()))
+                            .filter(date -> date.getStart().isBefore(LocalDateTime.now()) ||
+                                    date.getEnd().isBefore(LocalDateTime.now()) ||
+                                    date.getStart().equals(LocalDateTime.now()))
+                            .min(Comparator.comparing(Booking::getEnd))
                             .orElse(null)),
                     bookigsSize == 0 ? null : mapper.toLastNextItemDto(bookings.get(item).stream()
                             .filter(date -> date.getStart().isAfter(LocalDateTime.now()))
-                            .min((o1, o2) -> o2.getStart().compareTo(o1.getStart()))
+                            .max(Comparator.comparing(Booking::getStart))
                             .orElse(null)),
                     item.getId(),
                     commentsShort));
@@ -121,12 +124,14 @@ public class ItemServiceImpl implements ItemService {
         ItemBookingDto itemBookingDto;
         itemBookingDto = mapper.toItemBookingCommentDto(item,
                 bookings.size() == 0 ? null : mapper.toLastNextItemDto(bookings.stream()
-                        .filter(date -> date.getStart().isAfter(LocalDateTime.now()))
-                        .max((o1, o2) -> o2.getEnd().compareTo(o1.getEnd()))
+                        .filter(date -> date.getStart().isBefore(LocalDateTime.now()) ||
+                                date.getEnd().isBefore(LocalDateTime.now()) ||
+                                date.getStart().equals(LocalDateTime.now()))
+                        .min(Comparator.comparing(Booking::getEnd))
                         .orElse(null)),
                 bookings.size() == 0 ? null : mapper.toLastNextItemDto(bookings.stream()
                         .filter(date -> date.getStart().isAfter(LocalDateTime.now()))
-                        .min((o1, o2) -> o2.getStart().compareTo(o1.getStart()))
+                        .max(Comparator.comparing(Booking::getEnd))
                         .orElse(null)),
                 item.getId(),
                 comments);
