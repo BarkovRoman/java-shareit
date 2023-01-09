@@ -9,7 +9,6 @@ import ru.practicum.shareit.item.dto.ItemBookingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -49,7 +48,7 @@ public class ItemControllerServer {
     public List<ItemDto> searchItem(@RequestParam String text,
                                     @RequestParam Integer from,
                                     @RequestParam Integer size) {
-        return text.isBlank() ? Collections.emptyList() : itemService.search(text, from, size);
+        return itemService.search(text, from, size);
     }
 
     @PostMapping("/{itemId}/comment")

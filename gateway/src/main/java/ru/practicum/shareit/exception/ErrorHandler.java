@@ -35,7 +35,7 @@ public class ErrorHandler {
                                 String.format("Ошибка Валидации '%s' значение = '%s'",
                                         fieldError.getField(), fieldError.getRejectedValue()),
                         fieldError -> Objects.requireNonNullElse(fieldError.getDefaultMessage(), "")));
-        log.warn(String.valueOf(result), exception);
+        log.warn("Ошибка 400 {}, {}", result, exception);
         return result;
     }
 
@@ -57,7 +57,7 @@ public class ErrorHandler {
     public Map<String, String> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception) {
         String message = exception.getMessage();
         Map<String, String> result = Map.of("Ошибка Request", Objects.isNull(message) ? "Неизвестно" : message);
-        log.warn(String.valueOf(result), exception);
+        log.warn("Ошибка 400 {}, {}", result, exception);
         return result;
     }
 

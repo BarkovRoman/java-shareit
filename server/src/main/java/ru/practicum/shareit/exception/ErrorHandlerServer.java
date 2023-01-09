@@ -20,16 +20,20 @@ public class ErrorHandlerServer {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handleNotFoundException(NotFoundException exception) {      // 404 NOT_FOUND
-        Map<String, String> result = Map.of("Ошибка ", exception.getMessage());
-        log.warn(String.valueOf(result), exception);
-        return result;
+    public ResponseEntity<String> handleNotFoundException(NotFoundException exception) {      // 404 NOT_FOUND
+        log.warn("Ошибка 400 {}", exception.getMessage());
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler
     public ResponseEntity<String> handleIllegalRequestException(IllegalRequestException e) {   // 400 BAD_REQUEST
         log.warn("Ошибка 400 {}", e.getMessage());
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleThrowable(final Throwable e) {
+        log.warn("Ошибка сервера 500 {}", e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

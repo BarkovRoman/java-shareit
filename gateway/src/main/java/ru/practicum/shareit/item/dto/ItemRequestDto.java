@@ -14,10 +14,10 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode
 public class ItemRequestDto {
     @NotBlank(message = "name NotBlank")
-    String name;
+    private String name;
     @NotBlank(message = "description NotBlank")
-    String description;
+    private String description;
     @NotNull(message = "available NotNull")
-    Boolean available; // статус доступности
-    Long requestId;
+    private Boolean available; // статус доступности
+    private Long requestId;
 }

@@ -13,6 +13,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import static java.util.Collections.*;
+
 @Controller
 @RequestMapping(path = "/items")
 @RequiredArgsConstructor
@@ -57,7 +59,7 @@ public class ItemController {
                                              @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
                                              @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Search text={}, from={}, size={}", text, from, size);
-        return itemClient.search(text, from, size, userId);
+        return text.isBlank() ? ResponseEntity.ok(emptyList()) : itemClient.search(text, from, size, userId);
     }
 
     @PostMapping("/{itemId}/comment")
