@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.BookingStatus;
@@ -41,9 +42,9 @@ public class ItemServiceTest {
     private final ItemMapper itemMapper;
 
     @Test
+    @Sql("/dataTest.sql")
     public void createItem() {
-        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId = userService.add(userDto).getId();
+        Long userId = 1L;
 
         ItemDto itemDto = itemMapper.toItemDto(new Item(userId, "ItemName", "ItemDescription", true, null, userId));
         ItemDto itemDtoTest = itemService.add(itemDto, userId);
@@ -53,12 +54,10 @@ public class ItemServiceTest {
     }
 
     @Test
+    @Sql("/dataTest.sql")
     public void updateItemName() {
-        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId = userService.add(userDto).getId();
-
-        ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
-        Long itemId = itemService.add(itemDto, userId).getId();
+        Long userId = 1L;
+        Long itemId = 1L;
 
         ItemDto itemDtoUpdate = itemMapper.toItemDto(new Item(itemId, "ItemNameUpdate", null, true, null, userId));
         ItemDto itemDtoTest = itemService.update(userId, itemId, itemDtoUpdate);
@@ -68,12 +67,10 @@ public class ItemServiceTest {
     }
 
     @Test
+    @Sql("/dataTest.sql")
     public void updateItemDescription() {
-        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId = userService.add(userDto).getId();
-
-        ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
-        Long itemId = itemService.add(itemDto, userId).getId();
+        Long userId = 1L;
+        Long itemId = 1L;
 
         ItemDto itemDtoUpdate = itemMapper.toItemDto(new Item(itemId, "ItemName", "ItemDescriptionUpdate", true, null, userId));
         ItemDto itemDtoTest = itemService.update(userId, itemId, itemDtoUpdate);
@@ -83,12 +80,10 @@ public class ItemServiceTest {
     }
 
     @Test
+    @Sql("/dataTest.sql")
     public void updateItemAvailable() {
-        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId = userService.add(userDto).getId();
-
-        ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
-        Long itemId = itemService.add(itemDto, userId).getId();
+        Long userId = 1L;
+        Long itemId = 1L;
 
         ItemDto itemDtoUpdate = itemMapper.toItemDto(new Item(itemId, null, null, false, null, userId));
         ItemDto itemDtoTest = itemService.update(userId, itemId, itemDtoUpdate);
@@ -99,86 +94,70 @@ public class ItemServiceTest {
 
     @Test
     public void updateItemNotUserId() {
-        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId = userService.add(userDto).getId();
-        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId1 = userService.add(userDto1).getId();
+        Long userId = 1L;
+        Long itemId = 1L;
 
         ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
-        Long itemId = itemService.add(itemDto, userId).getId();
 
         assertThatThrownBy(() -> {
-            ItemDto itemDtoTest = itemService.update(userId1, itemId, itemDto);
+            itemService.update(50L, itemId, itemDto);
         }).isInstanceOf(NotFoundException.class);
     }
 
     @Test
+    @Sql("/dataTest.sql")
     public void getByUser() {
-        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId = userService.add(userDto).getId();
-
-        ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
-        Long itemId = itemService.add(itemDto, userId).getId();
+        Long userId = 1L;
+        Long itemId = 1L;
+        String name = "item1";
 
         List<ItemBookingDto> items = itemService.getByUser(userId, 0, 1);
 
         assertThat(1, equalTo(items.size()));
         assertThat(itemId, equalTo(items.get(0).getId()));
-        assertThat("ItemName", equalTo(items.get(0).getName()));
+        assertThat(name, equalTo(items.get(0).getName()));
     }
 
     @Test
+    @Sql("/dataTest.sql")
     public void getByUserByBooking() {
-        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId1 = userService.add(userDto1).getId();
-        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId = userService.add(userDto).getId();
-        ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
-        Long itemId = itemService.add(itemDto, userId1).getId();
+        Long userId = 1L;
+        Long itemId = 1L;
+        String name = "item1";
 
-        BookingDto bookingDto = BookingDto.builder().id(1L).itemId(itemId).status(BookingStatus.APPROVED)
-                .start(LocalDateTime.now()).end(LocalDateTime.now().plusNanos(2)).build();
-        long bookingId = bookingService.add(bookingDto, userId).getId();
-
-        List<ItemBookingDto> items = itemService.getByUser(userId1, 0, 2);
+        List<ItemBookingDto> items = itemService.getByUser(userId, 0, 2);
 
         assertThat(1, equalTo(items.size()));
         assertThat(itemId, equalTo(items.get(0).getId()));
-        assertThat("ItemName", equalTo(items.get(0).getName()));
+        assertThat(name, equalTo(items.get(0).getName()));
     }
 
     @Test
+    @Sql("/dataTest.sql")
     public void getById() {
-        UserDto userDto1 = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId1 = userService.add(userDto1).getId();
-        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"));
-        Long userId = userService.add(userDto).getId();
-        ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
-        Long itemId = itemService.add(itemDto, userId1).getId();
+        Long userId = 1L;
+        Long itemId = 1L;
+        String name = "item1";
+        String description = "descriptionItem1";
 
-        BookingDto bookingDto = BookingDto.builder().id(1L).itemId(itemId).status(BookingStatus.APPROVED)
-                .start(LocalDateTime.now()).end(LocalDateTime.now().plusNanos(2)).build();
-        bookingService.add(bookingDto, userId);
-
-        ItemBookingDto itemTest = itemService.getById(itemId, userId1);
+        ItemBookingDto itemTest = itemService.getById(itemId, userId);
 
         assertThat(itemId, equalTo(itemTest.getId()));
-        assertThat("ItemName", equalTo(itemTest.getName()));
-        assertThat("ItemDescription", equalTo(itemTest.getDescription()));
+        assertThat(name, equalTo(itemTest.getName()));
+        assertThat(description, equalTo(itemTest.getDescription()));
     }
 
     @Test
+    @Sql("/dataTest.sql")
     public void search() {
-        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId = userService.add(userDto).getId();
+        Long itemId = 1L;
+        String name = "item1";
+        String text = "1";
 
-        ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
-        Long itemId = itemService.add(itemDto, userId).getId();
-
-        List<ItemDto> items = itemService.search("descrip", 0, 1);
+        List<ItemDto> items = itemService.search(text, 0, 1);
 
         assertThat(1, equalTo(items.size()));
-        assertThat("ItemName", equalTo(items.get(0).getName()));
+        assertThat(name, equalTo(items.get(0).getName()));
         assertThat(itemId, equalTo(items.get(0).getId()));
     }
 
@@ -205,7 +184,7 @@ public class ItemServiceTest {
     @Test
     public void itemTest() {
         User user = new User(1L, "Name", "user@mail.ru");
-        ItemRequest itemRequest = new ItemRequest(1L,"Description", user, LocalDateTime.now());
+        ItemRequest itemRequest = new ItemRequest(1L, "Description", user, LocalDateTime.now());
         Item item = new Item(1L, "Name", "Description", true, itemRequest, 1L);
         ItemDto itemDto = ItemDto.builder().id(1L).name("Name").description("Description").available(true).requestId(1L).build();
 
@@ -218,7 +197,7 @@ public class ItemServiceTest {
     @Test
     public void commentTest() {
         User user = new User(1L, "Name", "user@mail.ru");
-        ItemRequest itemRequest = new ItemRequest(1L,"Description", user, LocalDateTime.now());
+        ItemRequest itemRequest = new ItemRequest(1L, "Description", user, LocalDateTime.now());
         Item item = new Item(1L, "Name", "Description", true, itemRequest, 1L);
         Comment comment = new Comment(1L, "Text", item, user, LocalDateTime.now());
         CommentDto commentDto = CommentDto.builder().id(1L).text("Text").build();
@@ -231,65 +210,37 @@ public class ItemServiceTest {
     }
 
     @Test
+    @Sql("/dataTest.sql")
     public void getByUserByComment() {
-        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId = userService.add(userDto).getId();
-        Long userId1 = userService.add(userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"))).getId();
-
-        ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
-        Long itemId = itemService.add(itemDto, userId).getId();
-
-        BookingDto bookingDto = BookingDto.builder().id(1L).itemId(itemId).status(BookingStatus.APPROVED)
-                .start(LocalDateTime.now()).end(LocalDateTime.now().plusNanos(2)).build();
-        bookingService.add(bookingDto, userId1);
-        CommentDto commentDto = CommentDto.builder().id(1L).text("Comments").build();
-
-        CommentResponseDto comment = itemService.addComments(userId1, itemId, commentDto);
-
-        BookingDto bookingDto1 = BookingDto.builder().id(2L).itemId(itemId).status(BookingStatus.APPROVED)
-                .start(LocalDateTime.now().plusNanos(10)).end(LocalDateTime.now().plusNanos(20)).build();
-        bookingService.add(bookingDto1, userId1);
+        Long userId = 1L;
+        Long itemId = 1L;
+        String name = "item1";
 
         List<ItemBookingDto> items = itemService.getByUser(userId, 0, 1);
 
         assertThat(1, equalTo(items.size()));
         assertThat(itemId, equalTo(items.get(0).getId()));
-        assertThat("ItemName", equalTo(items.get(0).getName()));
+        assertThat(name, equalTo(items.get(0).getName()));
     }
 
     @Test
+    @Sql("/dataTest.sql")
     public void getByIdByComment() {
-        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId = userService.add(userDto).getId();
-        Long userId1 = userService.add(userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"))).getId();
-
-        ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
-        Long itemId = itemService.add(itemDto, userId).getId();
-
-        BookingDto bookingDto = BookingDto.builder().id(1L).itemId(itemId).status(BookingStatus.APPROVED)
-                .start(LocalDateTime.now()).end(LocalDateTime.now().plusNanos(2)).build();
-        bookingService.add(bookingDto, userId1);
-        CommentDto commentDto = CommentDto.builder().id(1L).text("Comments").build();
-
-        CommentResponseDto comment = itemService.addComments(userId1, itemId, commentDto);
-
-        BookingDto bookingDto1 = BookingDto.builder().id(2L).itemId(itemId).status(BookingStatus.APPROVED)
-                .start(LocalDateTime.now().plusNanos(10)).end(LocalDateTime.now().plusNanos(20)).build();
-        bookingService.add(bookingDto1, userId1);
+        Long userId = 1L;
+        Long itemId = 1L;
+        String name = "item1";
 
         ItemBookingDto item = itemService.getById(itemId, userId);
 
         assertThat(itemId, equalTo(item.getId()));
-        assertThat("ItemName", equalTo(item.getName()));
+        assertThat(name, equalTo(item.getName()));
     }
 
     @Test
+    @Sql("/dataTest.sql")
     public void updateItemIsBlank() {
-        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId = userService.add(userDto).getId();
-
-        ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
-        Long itemId = itemService.add(itemDto, userId).getId();
+        Long userId = 1L;
+        Long itemId = 1L;
 
         ItemDto itemDtoUpdate = itemMapper.toItemDto(new Item(itemId, " ", " ", null, null, userId));
         ItemDto itemDtoTest = itemService.update(userId, itemId, itemDtoUpdate);
@@ -299,41 +250,24 @@ public class ItemServiceTest {
     }
 
     @Test
+    @Sql("/dataTest.sql")
     public void searchPage() {
-        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId = userService.add(userDto).getId();
-
-        ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
-        Long itemId = itemService.add(itemDto, userId).getId();
-
-        ItemDto itemDto1 = itemMapper.toItemDto(new Item(0L, "ItemName", "Description", true, null, userId));
-        Long itemId1 = itemService.add(itemDto1, userId).getId();
-
-        ItemDto itemDto3 = itemMapper.toItemDto(new Item(0L, "Description", "ItemDescription", true, null, userId));
-        Long itemId3 = itemService.add(itemDto3, userId).getId();
+        Long itemId = 2L;
 
         List<ItemDto> items = itemService.search("descrip", 1, 1);
 
         assertThat(1, equalTo(items.size()));
-        assertThat(itemId1, equalTo(items.get(0).getId()));
+        assertThat(itemId, equalTo(items.get(0).getId()));
     }
 
     @Test
+    @Sql("/dataTest.sql")
     public void createCommentsError() {
-        UserDto userDto = userMapper.toUserDto(new User(0L, "Name", "User@mail.ru"));
-        Long userId = userService.add(userDto).getId();
-        Long userId1 = userService.add(userMapper.toUserDto(new User(0L, "Name", "User1@mail.ru"))).getId();
-
-        ItemDto itemDto = itemMapper.toItemDto(new Item(0L, "ItemName", "ItemDescription", true, null, userId));
-        Long itemId = itemService.add(itemDto, userId).getId();
-
-        BookingDto bookingDto = BookingDto.builder().id(1L).itemId(itemId).status(BookingStatus.REJECTED)
-                .start(LocalDateTime.now()).end(LocalDateTime.now().plusNanos(2)).build();
-        bookingService.add(bookingDto, userId1);
-        CommentDto commentDto = CommentDto.builder().id(1L).text("Comments").build();
+        Long userId1 = 1L;
+        Long itemId = 1L;
 
         assertThatThrownBy(() -> {
-            CommentResponseDto comment = itemService.addComments(userId1, itemId, commentDto);
+            CommentResponseDto comment = itemService.addComments(userId1, itemId, CommentDto.builder().build());
         }).isInstanceOf(ExistingValidationException.class);
     }
 }

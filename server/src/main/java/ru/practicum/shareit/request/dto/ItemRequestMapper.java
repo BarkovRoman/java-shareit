@@ -2,14 +2,13 @@ package ru.practicum.shareit.request.dto;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
 import ru.practicum.shareit.item.dto.ItemRequestIdResponseDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring"/*, unmappedTargetPolicy = ReportingPolicy.IGNORE*/)
 public interface ItemRequestMapper {
     @Mapping(target = "requestor", source = "requestor")
     @Mapping(target = "id", source = "itemRequestDto.id")
