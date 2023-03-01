@@ -3,6 +3,17 @@
 Сервис позволяет не только бронировать вещь на определённые даты, но и закрывать к ней доступ на время бронирования от других желающих. На случай, если нужной вещи на сервисе нет, у пользователей есть возможность оставлять запросы. По запросу можно будет добавлять новые вещи для шеринга. 
 ---
 
+### :pushpin: Стек технологии:
+
+<div>
+<img src="https://github.com/devicons/devicon/blob/master/icons/java/java-original-wordmark.svg" title="Java" alt="Java" width="40" height="40"/>&nbsp&nbsp;
+<img src="https://github.com/devicons/devicon/blob/master/icons/spring/spring-original-wordmark.svg" title="Spring" alt="Spring" width="40" height="40"/>&nbsp&nbsp;
+<img src="https://github.com/devicons/devicon/blob/master/icons/docker/docker-original-wordmark.svg" title="Docker" alt="Docker" width="40" height="40"/>&nbsp&nbsp;
+<img src="https://github.com/devicons/devicon/blob/master/icons/postgresql/postgresql-original-wordmark.svg" title="Postgresql" alt="Postgresql" width="40" height="40"/>&nbsp&nbsp;
+</div>
+
+---
+
 ### Основные сценарии, которые поддерживает приложение:
 
 :heavy_check_mark: ***X-Sharer-User-Id*** это идентификатор пользователя поступает на вход в заголовке каждого из запросов.
